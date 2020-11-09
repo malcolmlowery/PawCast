@@ -1,27 +1,42 @@
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native';
+import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
+import { loginUser } from '../redux/actions/loginUserAction';
 import { colors } from '../utils/theme';
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation, login }) => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const onSubmit = () => {
+    return login(email, password)
+  }
+
   return (
     <Container onStartShouldSetResponder={Keyboard.dismiss}>
       <StatusBar barStyle='light-content'/>
-      
+
       <KeyboardAvoidingView behavior='position' contentContainerStyle={{ paddingBottom: 30 }}>
         <Card>
 
           <Text>Pawcast</Text>
 
           <InputGroup>
-            <TextInput label='Email' value={email} onChangeText={(text) => setEmail(text)} />
-            <TextInput label='Password' value={password} onChangeText={(text) => setPassword(text)} />
+            <TextInput 
+              label='Email' 
+              onChangeText={(text) => setEmail(text)} 
+              value={email} 
+            />
+            <TextInput 
+              label='Password' 
+              onChangeText={(text) => setPassword(text)} 
+              secureTextEntry={true}
+              value={password} 
+            />
           </InputGroup>
 
           <Button 
@@ -29,7 +44,8 @@ const Login = ({ navigation }) => {
             fontSize={14}
             color='white'
             marginTop={24}
-            marginBottom={16}>
+            marginBottom={16}
+            onPress={() => onSubmit()}>
             Login
           </Button>
 
@@ -56,7 +72,11 @@ const Login = ({ navigation }) => {
   )
 };
 
-export default Login;
+const mapDispatchToProps = (dispatch) => ({
+  login: (email, password) => dispatch(loginUser(email, password))
+})
+
+export default connect(null, mapDispatchToProps)(Login);
 
 const Container = styled.View`
   align-items: center;

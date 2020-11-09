@@ -5,6 +5,7 @@ interface TextInputI {
   label: string
   onChangeText: (_) => void
   onFocus?: () => void
+  secureTextEntry?: boolean
   value: string
 }
 
@@ -12,12 +13,13 @@ const TextInput: React.FC<TextInputI> = ({
   label,
   onChangeText,
   onFocus,
+  secureTextEntry = false,
   value
 }) => {
   return (
     <InputItem>
       <InputItemText>{label}</InputItemText>
-      <Input value={value} onChangeText={onChangeText} onFocus={onFocus}/>
+      <Input value={value} onChangeText={onChangeText} onFocus={onFocus} secureTextEntry={secureTextEntry}/>
     </InputItem>
   )
 };

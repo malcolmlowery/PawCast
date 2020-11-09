@@ -19,7 +19,7 @@ const fireAuth = firebase.auth();
 const fireStore = firebase.firestore();
 const fireStorage = firebase.storage();
 
-exports = { 
+export { 
   fireAuth,
   fireStore,
   fireStorage,
