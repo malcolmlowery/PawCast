@@ -4,18 +4,20 @@ import styled from 'styled-components/native';
 interface TextInputI {
   label: string
   onChangeText: (_) => void
+  onFocus?: () => void
   value: string
 }
 
 const TextInput: React.FC<TextInputI> = ({
   label,
   onChangeText,
+  onFocus,
   value
 }) => {
   return (
     <InputItem>
       <InputItemText>{label}</InputItemText>
-      <Input value={value} onChangeText={onChangeText}/>
+      <Input value={value} onChangeText={onChangeText} onFocus={onFocus}/>
     </InputItem>
   )
 };

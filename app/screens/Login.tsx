@@ -1,52 +1,57 @@
 import React, { useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native';
 import styled from 'styled-components/native';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import { colors } from '../utils/theme';
 
 const Login = ({ navigation }) => {
-
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <Container>
-      <Card>
+    <Container onStartShouldSetResponder={Keyboard.dismiss}>
+      <StatusBar barStyle='light-content'/>
+      
+      <KeyboardAvoidingView behavior='position' contentContainerStyle={{ paddingBottom: 30 }}>
+        <Card>
 
-        <Text>Pawcast</Text>
+          <Text>Pawcast</Text>
 
-        <InputGroup>
-          <TextInput label='Email' value={email} onChangeText={(text) => setEmail(text)} />
-          <TextInput label='Password' value={password} onChangeText={(text) => setPassword(text)} />
-        </InputGroup>
+          <InputGroup>
+            <TextInput label='Email' value={email} onChangeText={(text) => setEmail(text)} />
+            <TextInput label='Password' value={password} onChangeText={(text) => setPassword(text)} />
+          </InputGroup>
 
-        <Button 
-          fill='primary'
-          fontSize={14}
-          color='white'
-          marginTop={24}
-          marginBottom={16}>
-          Login
-        </Button>
+          <Button 
+            fill='primary'
+            fontSize={14}
+            color='white'
+            marginTop={24}
+            marginBottom={16}>
+            Login
+          </Button>
 
-        <Button 
-          fill='danger' 
-          fontSize={14}
-          color='white'
-          marginBottom={8}
-          onPress={() => navigation.push('signup')}>
-          Sign Up
-        </Button>
+          <Button 
+            fill='danger' 
+            fontSize={14}
+            color='white'
+            marginBottom={8}
+            onPress={() => navigation.push('signup')}>
+            Sign Up
+          </Button>
 
-        <Button 
-          fill='none' 
-          fontSize={14}
-          color='danger'
-          marginTop={16}>
-          forgot password
-        </Button>
+          <Button 
+            fill='none' 
+            fontSize={14}
+            color='danger'
+            marginTop={16}>
+            forgot password
+          </Button>
 
-      </Card>
+        </Card>
+      </KeyboardAvoidingView>
     </Container>
   )
 };
@@ -64,8 +69,8 @@ const Card = styled.View`
   box-shadow: 0 4px 12px rgba(0,0,0, 0.2);
   background: #fff;
   border-radius: 16px;
-  width: 340px;
   padding: 32px 16px;
+  width: 340px;
 `;
 
 const InputGroup = styled.View`
@@ -73,10 +78,10 @@ const InputGroup = styled.View`
 `;
 
 const Text = styled.Text`
-  text-align: center;
-  font-size: 28px;
-  padding: 8px 0;
-  font-weight: 500;
-  padding-bottom: 16px;
   color: #345ccb;
+  font-size: 28px;
+  font-weight: 500;
+  padding: 8px 0;
+  padding-bottom: 16px;
+  text-align: center;
 `;
