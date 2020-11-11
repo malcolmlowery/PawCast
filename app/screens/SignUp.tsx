@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native';
+import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
+import { createUser } from '../redux/actions/createUserAction';
 import { colors } from '../utils/theme';
 
-const SignUp = ({ navigation }) => {
+const SignUp = ({ createNewUser, navigation }) => {
 
   const [shiftCard, setShiftCard] = useState(false);
   
@@ -15,6 +17,17 @@ const SignUp = ({ navigation }) => {
   const [lastName, setLastName] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const onSubmit = () => {
+    const userInput = {
+      firstName,
+      lastName,
+      email,
+      password,
+      zipcode,
+    }
+    createNewUser(userInput)
+  }
 
   return (
     <Container onStartShouldSetResponder={Keyboard.dismiss}>
@@ -39,7 +52,8 @@ const SignUp = ({ navigation }) => {
             fontSize={14}
             color='white'
             marginTop={24}
-            marginBottom={16}>
+            marginBottom={16}
+            onPress={() => onSubmit()}>
             Sign Up
           </Button>
 
@@ -57,7 +71,11 @@ const SignUp = ({ navigation }) => {
   )
 };
 
-export default SignUp;
+const mapDisptachToProps = (dispatch) => ({
+  createNewUser: (userInput) => dispatch(createUser(userInput))
+});
+
+export default connect(null, mapDisptachToProps)(SignUp);
 
 const Container = styled.View`
   align-items: center;

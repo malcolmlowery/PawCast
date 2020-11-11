@@ -10,7 +10,9 @@ interface ButtonI {
   fontSize?: number
   fontWeight?: 'normal' | 'semi-bold' | 'bold'
   marginTop?: number
+  height?: number
   marginBottom?: number
+  right?: number
   onPress?: () => void
   width?: number
 }
@@ -19,12 +21,14 @@ const Button: React.FC<ButtonI> = ({
   children,
   color = 'white',
   expand = 'block',
+  height = 35,
   fill = 'primary',
   fontSize = 12,
   fontWeight = 'semi-bold',
   marginTop, 
   marginBottom,
   onPress,
+  right,
   width,
 }) => {
 
@@ -70,14 +74,17 @@ const Button: React.FC<ButtonI> = ({
         flexGrow: expandWidth(),
         marginTop, 
         marginBottom,
-        width
+        width,
+        right,
+        height,
+        justifyContent: 'center'
       }}
     >
       <Text 
         style={{
           color: fontColor(),
           fontSize,
-          fontWeight: fntWeight()
+          fontWeight: fntWeight(),
         }}
       >
         {children}
@@ -91,7 +98,6 @@ export default Button;
 const TouchableOpacityButton = styled.TouchableOpacity`
   align-items: center;
   border-radius: 3px;
-  padding: 10px 0;
 `
 
 const Text = styled.Text`
