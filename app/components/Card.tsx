@@ -35,7 +35,7 @@ const Card: React.FC<CardI> = ({
           showOptions,
         }: any = post;
 
-        console.log(post)
+        // console.log(post)
         
         return (
           <Container key={index}>

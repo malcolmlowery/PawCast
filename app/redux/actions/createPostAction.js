@@ -18,7 +18,9 @@ const createPostFailure = () => ({
   type: CREATE_POST_FAILURE
 });
 
-export const createNewPost = () => {
+export const createNewPost = (userInput) => {
+  const { description } = userInput;
+  console.log(description)
   return async (dispatch) => {
     try {
       dispatch(createPostRequest())
@@ -27,7 +29,7 @@ export const createNewPost = () => {
       await fireStore
         .collection('posts')
         .add({
-          description: postId,
+          description,
           postId,
           likes: 0,
           postOwner: {
