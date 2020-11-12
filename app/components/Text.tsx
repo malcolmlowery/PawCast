@@ -5,7 +5,7 @@ import { colors } from '../utils/theme';
 interface TextI {
   bottom?: number
   color?: 'primary' | 'secondary' | 'alert' | 'danger' | 'white'
-  children: string
+  children: any
   fontWeight?: 'normal' | 'semi-bold' | 'bold'
   fontSize?: number
   left?: number

@@ -24,16 +24,19 @@ export const createNewPost = () => {
       dispatch(createPostRequest())
       const uid = await fireAuth.currentUser.uid
       const postId = await fireStore.collection('posts').doc().id;
-      const user = await fireStore.collection(users).where('uid', '==', uid)
       await fireStore
         .collection('posts')
         .add({
-          description: 'Test Post',
+          description: postId,
           postId,
-          user: user,
+          likes: 0,
+          postOwner: {
+            uid,
+            name: 'name'
+          },
         })
-        .then((snapshot) => {
-          const createdPost = snapshot.get().then(doc => doc.data())
+        .then(async (snapshot) => {
+          const createdPost = await snapshot.get().then(doc => doc.data())
           dispatch(createPostSuccess(createdPost))
         })
     }

@@ -10,10 +10,10 @@ import { createNewPost } from '../redux/actions/createPostAction';
 import { fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
-const Newsfeed: React.FC<any> = ({ createPost, getPosts, posts }) => {
+const Newsfeed: React.FC<any> = ({ createPost, getPosts }) => {
 
   useEffect(() => {
-    // getPosts()
+    getPosts()
   }, [])
 
   return (
@@ -30,27 +30,19 @@ const Newsfeed: React.FC<any> = ({ createPost, getPosts, posts }) => {
 
         <ScrollView>
       <Content>
-        <Card description='Doberman pinschers are powerful, 
-          energetic dogs that need lots of exercise. If they are not 
-          exercised, they are more likely to become irritable or even 
-          aggressive. They can adjust well to apartment living if exercised daily.'
-        />
+        <Card />
       </Content>
         </ScrollView>
     </Container>
   )
 };
 
-const mapStateToProps = (state) => ({
-  posts: state.posts.posts
-})
-
 const mapDispatchToProps = (dispatch) => ({
   createPost: () => dispatch(createNewPost()),
   getPosts: () => dispatch(fetchPosts())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);
+export default connect(null, mapDispatchToProps)(Newsfeed);
 
 const Container = styled.View`
   flex: 1;

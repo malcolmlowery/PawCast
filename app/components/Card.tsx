@@ -4,116 +4,156 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
 import Text from './Text';
 import Button from './Button';
+import { connect } from 'react-redux';
 
 interface CardI {
-  description: string
+  setShowOptions: (a , b) => void
+  setEditPost: (a , b) => void
+  setCommentMode: (a , b) => void
+  posts: Array<any>
 }
 
 const Card: React.FC<CardI> = ({
-  description,
+  setShowOptions,
+  setEditPost,
+  setCommentMode,
+  posts,
 }) => {
-
-  const [commentMode, setCommentMode] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [editPost, setEditPost] = useState(false);
-
   return (
-    <Container>
-      <Header>
-        <GroupItem>
-          <Icon />
-          <Text fontSize={16} left={10} fontWeight='semi-bold'>Malcolm Lowery</Text>
-        </GroupItem>
+    <>
+    { posts &&
+      posts.map((post, index) => {
+        
+        const { 
+          comments,
+          commentMode,
+          editPost,
+          description, 
+          likes,
+          postOwner,
+          postId,
+          showOptions,
+        }: any = post;
 
-        <GroupItem>
-          { !showOptions ?
-            <Text fontSize={14} fontWeight='semi-bold' right={10}>1000 Likes</Text>
-            :
-            <OptionsButtonGroup>
-              <Button color='danger' expand='none' fill='none' fontSize={13} width={50}>Delete</Button>
+        console.log(post)
+        
+        return (
+          <Container key={index}>
+            <Header>
+              <GroupItem>
+                <Icon />
+                <Text fontSize={16} left={10} fontWeight='semi-bold'>{postOwner ? postOwner.name : 'N/A'}</Text>
+              </GroupItem>
+    
+              <GroupItem>
+                { !showOptions ?
+                  <Text fontSize={14} fontWeight='semi-bold' right={10}>{likes} Likes</Text>
+                  :
+                  <OptionsButtonGroup>
+                    <Button color='danger' expand='none' fill='none' fontSize={13} width={50}>Delete</Button>
+                    <Button 
+                      color='danger' 
+                      expand='none' 
+                      fill='none' 
+                      fontSize={13} 
+                      onPress={() => setEditPost(editPost, postId)} 
+                      width={80}>
+                        Edit
+                    </Button>
+                  </OptionsButtonGroup>
+                }
+                <Ionicons 
+                  color={colors.primary} 
+                  name='ios-options' 
+                  size={24} 
+                  onPress={() => setShowOptions(showOptions, postId)} 
+                />
+              </GroupItem>
+            </Header>
+    
+            <Content>
+              { !editPost ?
+                <Description>{description}</Description>
+                :
+                <EditDescriptionGroup>
+                  <DescriptionTextInput multiline={true} value={description} />
+                  <Button>Update</Button>
+                </EditDescriptionGroup>
+              }
+              <ImagesContainer>
+                <Image />
+              </ImagesContainer>
+            </Content>
+    
+            <ActionButtons>
+              <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
               <Button 
-                color='danger' 
-                expand='none' 
+                color='primary' 
                 fill='none' 
-                fontSize={13} 
-                onPress={() => {
-                  setEditPost(!editPost)
-                  setCommentMode(false)
-                }} 
-                width={80}>
-                  Edit
+                fontWeight='bold' 
+                onPress={() => setCommentMode(commentMode, postId)} 
+                width={40}>
+                  Comment
               </Button>
-            </OptionsButtonGroup>
-          }
-          <Ionicons 
-            color={colors.primary} 
-            name='ios-options' 
-            size={24} 
-            onPress={() => {
-              setShowOptions(!showOptions)
-              setEditPost(false)
-            }} 
-          />
-        </GroupItem>
-      </Header>
-
-      <Content>
-        { !editPost ?
-          <Description>{description}</Description>
-          :
-          <EditDescriptionGroup>
-            <DescriptionTextInput multiline={true} value={description} />
-            <Button>Update</Button>
-          </EditDescriptionGroup>
-        }
-        <ImagesContainer>
-          <Image />
-        </ImagesContainer>
-      </Content>
-
-      <ActionButtons>
-        <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
-        <Button 
-          color='primary' 
-          fill='none' 
-          fontWeight='bold' 
-          onPress={() => {
-            setCommentMode(!commentMode)
-            setEditPost(false)
-            setShowOptions(false)
-          }} 
-          width={40}>
-            Comment
-        </Button>
-      </ActionButtons>
-
-      <CommentSection>
-        <GroupItem>
-          { !commentMode ?
-            <>
-              <CommentIcon />
-              <CommentInfo>
-                <Text fontSize={13} left={10} fontWeight='semi-bold'>Malcolm Lowery</Text>
-                <Text fontSize={13} left={10}>Thats actually pretty cool!</Text>
-              </CommentInfo>
-            </>
-            :
-            <>
-              <AddCommentContainer>
-                <TextInput multiline={true} dsa />
-                <Button expand='none' height={36} width={80}>Post</Button>
-              </AddCommentContainer>
-            </>
-            
-          }
-        </GroupItem>
-      </CommentSection>
-
-    </Container>
+            </ActionButtons>
+    
+            <CommentSection>
+              <GroupItem>
+                { !commentMode ?
+                  <>
+                    { comments[0]
+                      ?
+                      <>
+                        <CommentIcon />
+                        <CommentInfo>
+                          <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments[0]?.commentOwner.name}</Text>
+                          <Text fontSize={13} left={10}>{comments[0]?.comment}</Text>
+                        </CommentInfo>
+                      </>
+                      :
+                      <Text>No Comments</Text>
+                    }
+                  </>
+                  :
+                  <>
+                    <AddCommentContainer>
+                      <TextInput multiline={true} />
+                      <Button expand='none' height={36} width={80}>Post</Button>
+                    </AddCommentContainer>
+                  </>
+                  
+                }
+              </GroupItem>
+            </CommentSection>
+    
+          </Container>
+        )
+      })
+    }
+    </>
   )
 };
 
-export default Card;
+const mapStateToProps = (state) => ({
+  posts: state.posts.data
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  setShowOptions: (showOptions, postId) => dispatch({
+    type: 'SHOW_OPTIONS_MODE',
+    payload: { showOptions, postId }
+  }),
+  setEditPost: (editPost, postId) => dispatch({
+    type: 'EDIT_DESC_MODE',
+    payload: { editPost, postId }
+  }),
+  setCommentMode: (commentMode, postId) => dispatch({
+    type: 'COMMENT_MODE',
+    payload: { commentMode, postId }
+  })
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Card);
 
 const Container = styled.View`
   background: ${colors.white};
