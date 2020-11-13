@@ -1,19 +1,40 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { Keyboard, KeyboardAvoidingView } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
 import Button from './Button';
 import Text from './Text';
 import { createNewPost } from '../redux/actions/createPostAction';
+import { fireStorage } from '../firebase/firebase';
 
 const CreatePostForm = ({ createPost, onPress }) => {
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null);
+
+  const openImagePicker = async () => {
+    let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    let result: any = await ImagePicker.launchImageLibraryAsync();
+    
+    if(permissionResult.granted === false) {
+      return (
+        Alert.alert(
+          'Permission Denied',
+          'Permission to access camera roll is required!'
+        )
+      )
+    }
+        
+    if(!result.cancelled) {
+      setImage(result.uri)
+      console.log(result)
+    }
+  }
 
   const onSubmit = () => {
-    const userInput = { description }
-    return createPost(userInput)
+    // const userInput = { description };
   }
 
   return (
@@ -29,13 +50,15 @@ const CreatePostForm = ({ createPost, onPress }) => {
             <Content>
               <TextInput multiline={true} onChangeText={(text) => setDescription(text)} value={description} />
               <ImageSection>
-                <Icon>
+                <Icon onPress={() => openImagePicker()}>
                   <Text fontSize={12}>Add Image</Text>
                   <Ionicons color={colors.primary} name='ios-add-circle' size={48} />
                 </Icon>
-                <ImagePreview>
-
-                </ImagePreview>
+                { image !== null ?
+                  <ImagePreview source={{ uri: image }} />  
+                  :
+                  <ImagePreview  />  
+                }
               </ImageSection>
             </Content>
 
@@ -88,7 +111,7 @@ const Container = styled.View`
   justify-content: center;
   position: absolute;
   width: 100%;
-  z-index: 11
+  z-index: 11;
 `;
 
 const Card = styled.View`
@@ -123,7 +146,7 @@ const TextInput = styled.TextInput`
   width: 100%;
 `;
 
-const Icon = styled.View`
+const Icon = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   width: 70px;
@@ -131,7 +154,7 @@ const Icon = styled.View`
 
 const ImageSection = styled.View`
   flex-direction: row;
-  justify-content: space-between
+  justify-content: space-between;
   margin: 20px 0;
   width: 100%;
 `;
