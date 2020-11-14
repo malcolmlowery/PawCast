@@ -29,6 +29,7 @@ const Card: React.FC<CardI> = ({
           commentMode,
           editPost,
           description, 
+          imageUrl,
           likes,
           postOwner,
           postId,
@@ -81,7 +82,7 @@ const Card: React.FC<CardI> = ({
                 </EditDescriptionGroup>
               }
               <ImagesContainer>
-                <Image />
+                <Image source={{ uri: imageUrl }} />
               </ImagesContainer>
             </Content>
     
@@ -162,12 +163,15 @@ const Container = styled.View`
   margin-top: 16px;
   margin-left: 16px;
   margin-right: 16px;
-  padding: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 `;
 
 const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 const GroupItem = styled.View`
@@ -193,6 +197,8 @@ const Content = styled.View`
 const Description = styled.Text`
   line-height: 17px;
   margin: 10px 0;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 const ImagesContainer = styled.View`
@@ -212,6 +218,8 @@ const CommentSection = styled.View`
   border-top-width: 1px;
   border-color: #ebebeb;
   padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 const CommentIcon = styled.Image`
@@ -240,6 +248,8 @@ const TextInput = styled.TextInput`
 
 const EditDescriptionGroup = styled.View`
   margin: 10px 0;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 const DescriptionTextInput = styled.TextInput`

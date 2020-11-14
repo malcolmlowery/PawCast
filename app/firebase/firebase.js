@@ -23,4 +23,5 @@ export {
   fireAuth,
   fireStore,
   fireStorage,
+  firebase,
 };

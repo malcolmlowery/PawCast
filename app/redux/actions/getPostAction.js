@@ -25,6 +25,7 @@ export const fetchPosts = () => {
 
       const postsData = await fireStore
         .collection('posts')
+        .orderBy('createdAt', 'desc')
         .get()
         .then(snapshot => {
           const posts = [];

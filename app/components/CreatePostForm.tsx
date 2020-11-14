@@ -8,7 +8,6 @@ import { colors } from '../utils/theme';
 import Button from './Button';
 import Text from './Text';
 import { createNewPost } from '../redux/actions/createPostAction';
-import { fireStorage } from '../firebase/firebase';
 
 const CreatePostForm = ({ createPost, onPress }) => {
   const [description, setDescription] = useState('');
@@ -16,7 +15,10 @@ const CreatePostForm = ({ createPost, onPress }) => {
 
   const openImagePicker = async () => {
     let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    let result: any = await ImagePicker.launchImageLibraryAsync();
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      quality: 0,
+    });
     
     if(permissionResult.granted === false) {
       return (
@@ -29,12 +31,12 @@ const CreatePostForm = ({ createPost, onPress }) => {
         
     if(!result.cancelled) {
       setImage(result.uri)
-      console.log(result)
     }
   }
 
-  const onSubmit = () => {
-    // const userInput = { description };
+  const onSubmit = async () => {
+    const userInput = { description, image };
+    createPost(userInput)
   }
 
   return (
@@ -91,7 +93,7 @@ const CreatePostForm = ({ createPost, onPress }) => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  createPost: (description) => dispatch(createNewPost(description)),
+  createPost: (userInput) => dispatch(createNewPost(userInput)),
 })
 
 export default connect(null, mapDispatchToProps)(CreatePostForm);
