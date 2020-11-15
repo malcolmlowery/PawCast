@@ -3,11 +3,12 @@ import styled from 'styled-components/native';
 
 interface AppHeaderI {
   children: React.ReactNode
+  height?: number
 }
 
-const AppHeader: React.FC<AppHeaderI> = ({ children }) => {
+const AppHeader: React.FC<AppHeaderI> = ({ children, height= 120 }) => {
   return (
-    <Container>
+    <Container style={{ height }}>
       <Content>
         {children}
       </Content>
@@ -20,7 +21,6 @@ export default AppHeader;
 const Container = styled.View`
   background: #fff;
   box-shadow: 0 4px 24px rgba(0,0,0, 0.05);
-  height: 120px;
   padding-top: 30px;
   position: relative;
   z-index: 10;

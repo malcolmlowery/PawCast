@@ -7,11 +7,19 @@ import Button from '../components/Button';
 import Card from '../components/Card';
 import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
+import { fireAuth } from '../firebase/firebase';
 import { createNewPost } from '../redux/actions/createPostAction';
 import { fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
-const Newsfeed: React.FC<any> = ({ getPosts }) => {
+const Newsfeed: React.FC<any> = ({ 
+  getPosts, 
+  navigation,
+  posts, 
+  setShowOptions, 
+  setCommentMode, 
+  setEditPost,
+}) => {
 
   useEffect(() => {
     getPosts()
@@ -31,25 +39,77 @@ const Newsfeed: React.FC<any> = ({ getPosts }) => {
             <Button color='white' expand='none' height={35}  width={100} fontSize={14} fill='danger' right={16} onPress={() => setPostFormVisible(!postFormVisible)}>
               New Post
             </Button>
-            <Icon source={{ uri: 'https://scontent.fmia1-2.fna.fbcdn.net/v/t1.0-9/48417117_10218162259391995_2600251369403187200_o.jpg?_nc_cat=100&ccb=2&_nc_sid=8bfeb9&_nc_ohc=yedBXjrPqM8AX960e2c&_nc_ht=scontent.fmia1-2.fna&oh=516e2a1ef08c51e59da99ad55795adf4&oe=5FCF05F7' }} />
+            <ProfileButton onPress={() => navigation.navigate('profile')}>
+              <Icon source={{ uri: fireAuth.currentUser.photoURL }} />
+            </ProfileButton>
           </ButtonArea>
         </AppHeader>
 
-          <ScrollView>
-        <Content>
-          <Card />
-        </Content>
-          </ScrollView>
+        <ScrollView>
+          <Content>
+          { posts &&
+            posts.map((post, index) => {
+
+              const { 
+                comments,
+                commentMode,
+                editPost,
+                description, 
+                imageUrl,
+                likes,
+                postOwner,
+                postId,
+                showOptions,
+              }: any = post;
+
+              return (
+                <Card 
+                  key={index}
+                  description={description}
+                  username={postOwner.name}
+                  imageUrl={imageUrl}
+                  likes={likes}
+                  commentMode={commentMode}
+                  editPost={editPost}
+                  showOptions={showOptions}
+                  handleShowOptions={() => setShowOptions(showOptions, postId)}
+                  comments={comments[0]}
+                  setCommentMode={() => setCommentMode(commentMode, postId)}
+                  setEditPost={() => setEditPost(editPost, postId)}
+                  profileImage={postOwner.profileImage}
+                />
+              )
+            })
+          }
+          </Content>
+        </ScrollView>
       </Container>
     </>
   )
 };
 
+const mapStateToProps = (state) => ({
+  posts: state.posts.data,
+  profileImage: state.userProfile.profileImage,
+})
+
 const mapDispatchToProps = (dispatch) => ({
-  getPosts: () => dispatch(fetchPosts())
+  getPosts: () => dispatch(fetchPosts()),
+  setShowOptions: (showOptions, postId) => dispatch({
+    type: 'SHOW_OPTIONS_MODE',
+    payload: { showOptions, postId }
+  }),
+  setEditPost: (editPost, postId) => dispatch({
+    type: 'EDIT_DESC_MODE',
+    payload: { editPost, postId }
+  }),
+  setCommentMode: (commentMode, postId) => dispatch({
+    type: 'COMMENT_MODE',
+    payload: { commentMode, postId }
+  })
 });
 
-export default connect(null, mapDispatchToProps)(Newsfeed);
+export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);
 
 const Container = styled.View`
   flex: 1;
@@ -60,11 +120,19 @@ const ButtonArea = styled.View`
   flex-direction: row;
 `;
 
-const Icon = styled.Image`
+const ProfileButton = styled.TouchableOpacity`
+  box-shadow: 0 4px 12px rgba(0,0,0, 0.15); 
   height: 38px;
   width: 38px;
+`;
+
+const Icon = styled.Image`
   border-radius: 19px;
   background: ${colors.primary};
+  border-width: 1px;
+  border-color: ${colors.white};
+  height: 38px;
+  width: 38px;
 `;
 
 const Content = styled.View`

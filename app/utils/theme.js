@@ -4,5 +4,6 @@ export const colors = {
   alert: '#ebdc14',
   danger: '#dc235a',
   none: 'transparent',
-  white: '#fff'
+  white: '#fff',
+  darkText: '#181818',
 }

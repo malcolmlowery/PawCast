@@ -1,160 +1,138 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
 import Text from './Text';
 import Button from './Button';
-import { connect } from 'react-redux';
 
 interface CardI {
-  setShowOptions: (a , b) => void
-  setEditPost: (a , b) => void
-  setCommentMode: (a , b) => void
+  setShowOptions: () => void
+  setEditPost: () => void
+  setCommentMode: () => void
   posts: Array<any>
+  description: string
+  comments: any
+  commentMode: boolean
+  editPost: boolean
+  imageUrl: string
+  likes: number
+  postOwner: string
+  postId: string
+  showOptions: boolean
+  username: string
+  handleShowOptions: () => void
+  profileImage,
 }
 
 const Card: React.FC<CardI> = ({
-  setShowOptions,
   setEditPost,
+  username,
+  commentMode,
+  comments,
+  editPost,
+  description, 
+  imageUrl,
+  likes,
+  postId,
+  showOptions,
+  handleShowOptions,
   setCommentMode,
-  posts,
+  profileImage,
 }) => {
   return (
-    <>
-    { posts &&
-      posts.map((post, index) => {
-        
-        const { 
-          comments,
-          commentMode,
-          editPost,
-          description, 
-          imageUrl,
-          likes,
-          postOwner,
-          postId,
-          showOptions,
-        }: any = post;
+    <Container>
+      <Header>
+        <GroupItem>
+          <Icon source={{ uri: profileImage }} />
+          <Text fontSize={16} left={10} fontWeight='semi-bold'>{username ? username : 'N/A'}</Text>
+        </GroupItem>
 
-        // console.log(post)
-        
-        return (
-          <Container key={index}>
-            <Header>
-              <GroupItem>
-                <Icon />
-                <Text fontSize={16} left={10} fontWeight='semi-bold'>{postOwner ? postOwner.name : 'N/A'}</Text>
-              </GroupItem>
-    
-              <GroupItem>
-                { !showOptions ?
-                  <Text fontSize={14} fontWeight='semi-bold' right={10}>{likes} Likes</Text>
-                  :
-                  <OptionsButtonGroup>
-                    <Button color='danger' expand='none' fill='none' fontSize={13} width={50}>Delete</Button>
-                    <Button 
-                      color='danger' 
-                      expand='none' 
-                      fill='none' 
-                      fontSize={13} 
-                      onPress={() => setEditPost(editPost, postId)} 
-                      width={80}>
-                        Edit
-                    </Button>
-                  </OptionsButtonGroup>
-                }
-                <Ionicons 
-                  color={colors.primary} 
-                  name='ios-options' 
-                  size={24} 
-                  onPress={() => setShowOptions(showOptions, postId)} 
-                />
-              </GroupItem>
-            </Header>
-    
-            <Content>
-              { !editPost ?
-                <Description>{description}</Description>
-                :
-                <EditDescriptionGroup>
-                  <DescriptionTextInput multiline={true} value={description} />
-                  <Button>Update</Button>
-                </EditDescriptionGroup>
-              }
-              <ImagesContainer>
-                <Image source={{ uri: imageUrl }} />
-              </ImagesContainer>
-            </Content>
-    
-            <ActionButtons>
-              <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
+        <GroupItem>
+          { !showOptions ?
+            <Text fontSize={14} fontWeight='semi-bold' right={10}>{likes} Likes</Text>
+            :
+            <OptionsButtonGroup>
+              <Button color='danger' expand='none' fill='none' fontSize={13} width={50}>Delete</Button>
               <Button 
-                color='primary' 
+                color='danger' 
+                expand='none' 
                 fill='none' 
-                fontWeight='bold' 
-                onPress={() => setCommentMode(commentMode, postId)} 
-                width={40}>
-                  Comment
+                fontSize={13} 
+                onPress={() => setEditPost()} 
+                width={80}>
+                  Edit
               </Button>
-            </ActionButtons>
-    
-            <CommentSection>
-              <GroupItem>
-                { !commentMode ?
-                  <>
-                    { comments[0]
-                      ?
-                      <>
-                        <CommentIcon />
-                        <CommentInfo>
-                          <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments[0]?.commentOwner.name}</Text>
-                          <Text fontSize={13} left={10}>{comments[0]?.comment}</Text>
-                        </CommentInfo>
-                      </>
-                      :
-                      <Text>No Comments</Text>
-                    }
-                  </>
-                  :
-                  <>
-                    <AddCommentContainer>
-                      <TextInput multiline={true} />
-                      <Button expand='none' height={36} width={80}>Post</Button>
-                    </AddCommentContainer>
-                  </>
-                  
-                }
-              </GroupItem>
-            </CommentSection>
-    
-          </Container>
-        )
-      })
-    }
-    </>
+            </OptionsButtonGroup>
+          }
+          <Ionicons 
+            color={colors.primary} 
+            name='ios-options' 
+            size={24} 
+            onPress={() => handleShowOptions()} 
+          />
+        </GroupItem>
+      </Header>
+
+      <Content>
+        { !editPost ?
+          <Description>{description}</Description>
+          :
+          <EditDescriptionGroup>
+            <DescriptionTextInput multiline={true} value={description} />
+            <Button>Update</Button>
+          </EditDescriptionGroup>
+        }
+        <ImagesContainer>
+          <Image source={{ uri: imageUrl }} />
+        </ImagesContainer>
+      </Content>
+
+      <ActionButtons>
+        <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
+        <Button 
+          color='primary' 
+          fill='none' 
+          fontWeight='bold' 
+          onPress={() => setCommentMode()} 
+          width={40}>
+            Comment
+        </Button>
+      </ActionButtons>
+
+      <CommentSection>
+        <GroupItem>
+          { !commentMode ?
+            <>
+              { comments
+                ?
+                <>
+                  <CommentIcon />
+                  <CommentInfo>
+                    <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments[0]?.commentOwner.name}</Text>
+                    <Text fontSize={13} left={10}>{comments[0]?.comment}</Text>
+                  </CommentInfo>
+                </>
+                :
+                <Text>No Comments</Text>
+              }
+            </>
+            :
+            <>
+              <AddCommentContainer>
+                <TextInput multiline={true} />
+                <Button expand='none' height={36} width={80}>Post</Button>
+              </AddCommentContainer>
+            </>
+            
+          }
+        </GroupItem>
+      </CommentSection>
+
+    </Container>
   )
 };
 
-const mapStateToProps = (state) => ({
-  posts: state.posts.data
-})
-
-const mapDispatchToProps = (dispatch) => ({
-  setShowOptions: (showOptions, postId) => dispatch({
-    type: 'SHOW_OPTIONS_MODE',
-    payload: { showOptions, postId }
-  }),
-  setEditPost: (editPost, postId) => dispatch({
-    type: 'EDIT_DESC_MODE',
-    payload: { editPost, postId }
-  }),
-  setCommentMode: (commentMode, postId) => dispatch({
-    type: 'COMMENT_MODE',
-    payload: { commentMode, postId }
-  })
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Card);
+export default Card;
 
 const Container = styled.View`
   background: ${colors.white};
@@ -184,10 +162,10 @@ const OptionsButtonGroup = styled.View`
 `;
 
 const Icon = styled.Image`
-  height: 38px;
-  width: 38px;
   border-radius: 19px;
   background: ${colors.primary};
+  height: 38px;
+  width: 38px;
 `;
 
 const Content = styled.View`
@@ -195,7 +173,7 @@ const Content = styled.View`
 `;
 
 const Description = styled.Text`
-  line-height: 17px;
+  line-height: 19px;
   margin: 10px 0;
   padding-left: 10px;
   padding-right: 10px;
@@ -207,7 +185,7 @@ const ImagesContainer = styled.View`
 `;
 
 const Image = styled.Image`
-  height: 200px;
+  height: 300px;
 `;
 
 const ActionButtons = styled.View`

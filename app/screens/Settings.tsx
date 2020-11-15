@@ -8,7 +8,7 @@ import AppHeader from '../components/AppHeader';
 import Button from '../components/Button';
 import Text from '../components/Text';
 
-const Settings = ({ logout }) => {
+const Settings = ({ logout, navigation }) => {
   return (
     <Container>
       <AppHeader>
@@ -27,24 +27,31 @@ const Settings = ({ logout }) => {
 
         <ButtonGroup>
           <CircleButtonItem>
-            <CircleButtonIcon>
-              <Ionicons name='md-person' color='#fff' size={38} />
+            <CircleButtonIcon onPress={() => navigation.navigate('profile')}>
+              <Ionicons name='md-person' color='#fff' size={32} />
             </CircleButtonIcon>
             <CircleButtonLabel>Profile</CircleButtonLabel>
           </CircleButtonItem>
 
           <CircleButtonItem>
             <CircleButtonIcon>
-              <Ionicons name='ios-pin' color='#fff' size={38} />
+              <Ionicons name='ios-pin' color='#fff' size={32} />
             </CircleButtonIcon>
             <CircleButtonLabel>Map</CircleButtonLabel>
           </CircleButtonItem>
 
           <CircleButtonItem>
             <CircleButtonIcon>
-              <Ionicons name='ios-paw' color='#fff' size={38} />
+              <Ionicons name='ios-paw' color='#fff' size={32} />
             </CircleButtonIcon>
             <CircleButtonLabel>My Pets</CircleButtonLabel>
+          </CircleButtonItem>
+
+          <CircleButtonItem>
+            <CircleButtonIcon onPress={() => navigation.push('updateProfile')}>
+              <Ionicons name='ios-construct' color='#fff' size={32} />
+            </CircleButtonIcon>
+            <CircleButtonLabel style={{ color: colors.danger }}>Update Profile</CircleButtonLabel>
           </CircleButtonItem>
         </ButtonGroup>
       </Content>
@@ -76,10 +83,11 @@ const ButtonGroup = styled.View`
 
 const CircleButtonItem = styled.View`
   align-items: center;
+  width: 120px;
 `;
 
 const CircleButtonLabel = styled.Text`
-  margin-top: 8px;
+  margin: 16px 0;
 `;
 
 const CircleButtonIcon = styled.TouchableOpacity`

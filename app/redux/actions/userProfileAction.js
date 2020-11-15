@@ -5,32 +5,30 @@ import {
   GET_POST_FAILURE,
 } from './Types';
 
-export const getPostRequest = () => ({
-  type: GET_POST_REQUEST
+export const getUserPostRequest = () => ({
+  type: 'GET_USER_REQUEST'
 });
 
-export const getPostSuccess = (data) => ({
-  type: GET_POST_SUCCESS,
+export const getUserPostSuccess = (data) => ({
+  type: 'GET_USER_SUCCESS',
   payload: data
 });
 
-export const getPostFailure = () => ({
-  type: GET_POST_FAILURE
+export const getUserPostFailure = () => ({
+  type: 'GET_USER_FAILURE'
 });
 
-export const fetchPosts = () => {
+export const fetchUserPosts = () => {
   return async (dispatch) => {
     try {
-      dispatch(getPostRequest())
-
-      // fireAuth.currentUser.updateProfile({
-      //   displayName: 'Pawcast',
-      //   photoURL: 'https://cdn11.bigcommerce.com/s-dpaf5pw/images/stencil/original/products/148/658/PawStencilSmallNEW__06609.1544726380.jpg?c=2'
-      // })
-
+      dispatch(getUserPostRequest())
+      const uid = await fireAuth.currentUser.uid;
+      const userInfo = await fireAuth.currentUser;
+      
       const postsData = await fireStore
         .collection('posts')
-        .orderBy('createdAt', 'desc')
+        .where('postOwner.uid', '==', uid)
+        // .orderBy('createdAt', 'desc')
         .get()
         .then(snapshot => {
           const posts = [];
@@ -67,12 +65,15 @@ export const fetchPosts = () => {
           }
         }
       })
-
-      dispatch(getPostSuccess(postWithComments))
-  
+      
+      dispatch(getUserPostSuccess({
+        postWithComments: postWithComments,
+        profileImage: userInfo.photoURL
+      }))
     }
     catch(error) {
-      dispatch(getPostFailure(error))
+      console.log(getUserPostFailure(error))
+      dispatch(getUserPostFailure(error))
     }
   }
 }

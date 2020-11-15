@@ -35,6 +35,7 @@ export const createNewPost = (userInput) => {
       const uid = await fireAuth.currentUser.uid
       const postId = await fireStore.collection('posts').doc().id;
       const timestamp = firebase.firestore.Timestamp.now();
+      const userInfo = fireAuth.currentUser;
 
       const urlOfImage = await fireStorage
         .ref()
@@ -55,7 +56,8 @@ export const createNewPost = (userInput) => {
           likes: 0,
           postOwner: {
             uid,
-            name: 'name'
+            name: userInfo.displayName,
+            profileImage: userInfo.photoURL,
           },
         })
         .then(async (snapshot) => {

@@ -17,7 +17,7 @@ const CreatePostForm = ({ createPost, onPress }) => {
     let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     let result: any = await ImagePicker.launchImageLibraryAsync({
       base64: true,
-      quality: 0,
+      quality: 1,
     });
     
     if(permissionResult.granted === false) {
@@ -59,7 +59,7 @@ const CreatePostForm = ({ createPost, onPress }) => {
                 { image !== null ?
                   <ImagePreview source={{ uri: image }} />  
                   :
-                  <ImagePreview  />  
+                  <ImagePreview />  
                 }
               </ImageSection>
             </Content>
