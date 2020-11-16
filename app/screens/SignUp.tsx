@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native';
 import { connect } from 'react-redux';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import styled from 'styled-components/native';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import { createUser } from '../redux/actions/createUserAction';
 import { colors } from '../utils/theme';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const SignUp = ({ createNewUser, navigation }) => {
 
@@ -17,6 +20,27 @@ const SignUp = ({ createNewUser, navigation }) => {
   const [lastName, setLastName] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [image, setImage] = useState(null);
+
+  const openImagePicker = async () => {
+    const premissions = await ImagePicker.requestCameraPermissionsAsync();
+    const result: any = await ImagePicker.launchImageLibraryAsync({
+      base64: true
+    });
+
+    if(premissions.granted === false) {
+      return (
+        Alert.alert(
+          'Permission Denied',
+          'Permission to access camera roll is required!'
+        )
+      )
+    }
+        
+    if(!result.cancelled) {
+      setImage(result.uri)
+    }
+  }
 
   const onSubmit = () => {
     const userInput = {
@@ -25,6 +49,7 @@ const SignUp = ({ createNewUser, navigation }) => {
       email,
       password,
       zipcode,
+      image,
     }
     createNewUser(userInput)
   }

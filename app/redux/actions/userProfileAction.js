@@ -44,6 +44,16 @@ export const fetchUserPosts = () => {
           snapshot.forEach(doc => comments.push(doc.data()))
           return comments
         })
+      
+      const dogsData = await fireStore
+        .collection('animals')
+        .where('dogOwner.uid', '==', uid)
+        .get()
+        .then(snapshot => {
+          const dogs = [];
+          snapshot.forEach(doc => dogs.push(doc.data()))
+          return dogs
+        })
 
       const posts = postsData.map(post => post)
       
@@ -68,6 +78,7 @@ export const fetchUserPosts = () => {
       
       dispatch(getUserPostSuccess({
         postWithComments: postWithComments,
+        dogs: dogsData,
         profileImage: userInfo.photoURL
       }))
     }

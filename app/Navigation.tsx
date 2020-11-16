@@ -8,6 +8,7 @@ import SignUp from './screens/SignUp';
 import Profile from './screens/Profile';
 import Home from './screens/Home';
 import UpdateProfile from './screens/UpdateProfile';
+import { fireAuth, fireStorage } from './firebase/firebase';
 
 const Stack = createStackNavigator();
 
@@ -27,11 +28,11 @@ const Navigation = ({ isAuthenticated, verifyUser }) => {
         </Stack.Navigator>
         :
         <>
-       <Stack.Navigator>
-         <Stack.Screen name='home' component={Home}  options={{ headerShown: false }} />
-         <Stack.Screen name='profile' component={Profile} options={{ headerShown: false }} />
-         <Stack.Screen name='updateProfile' component={UpdateProfile} options={{ headerShown: false }} />
-       </Stack.Navigator>
+        <Stack.Navigator>
+          <Stack.Screen name='home' component={Home}  options={{ headerShown: false }} />
+          <Stack.Screen name='profile' component={Profile} options={{ headerShown: false }} />
+          <Stack.Screen name='updateProfile' component={UpdateProfile} options={{ headerShown: false }} />
+        </Stack.Navigator>
         </>
       }
     </NavigationContainer>

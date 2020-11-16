@@ -11,8 +11,10 @@ import CreatePostForm from '../components/CreatePostForm';
 import { connect } from 'react-redux';
 import { fetchUserPosts } from '../redux/actions/userProfileAction';
 import AddDogForm from '../components/AddDogForm';
+import { fireAuth } from '../firebase/firebase';
 
 const Profile = ({ 
+  dogs,
   navigation, 
   getUserPosts, 
   posts, 
@@ -41,7 +43,7 @@ const Profile = ({
               name='ios-arrow-back' 
               size={30} 
             />
-            <Text color='primary' fontSize={18} fontWeight='semi-bold' left={10}>Newsfeed</Text>
+            <Text color='primary' fontSize={18} fontWeight='semi-bold' left={10}>Back</Text>
           </TitleArea>
           <Ionicons 
             color={colors.primary} 
@@ -62,7 +64,7 @@ const Profile = ({
             </ProfileImageContainer>
 
             <UserInfo>
-              <Text color='darkText' fontSize={28} fontWeight='semi-bold'>Malcolm Lowery</Text>
+              <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
               <Location>
                 <Text color='darkText' fontSize={16} fontWeight='semi-bold'>Fort Lauderdale, FL</Text>
               </Location>
@@ -76,10 +78,16 @@ const Profile = ({
             <PetsContainer>
               <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
               <ScrollView horizontal={true} style={{ height: 130 }}>
-                <PetItem>
-                  <PatImage />
-                  <Text top={6}>Name</Text>
-                </PetItem>
+                { dogs &&
+                  dogs.map((dog, index) => {
+                    return (
+                      <PetItem key={index}>
+                        <PatImage source={{ uri: dog.images[0] }} />
+                        <Text top={6}>{dog.name}</Text>
+                      </PetItem>
+                    )
+                  })
+                }
               </ScrollView>
             </PetsContainer>
 
@@ -113,6 +121,7 @@ const Profile = ({
                       comments={comments[0]}
                       setCommentMode={() => setCommentMode(commentMode, postId)}
                       setEditPost={() => setEditPost(editPost, postId)}
+                      profileImage={postOwner.profileImage}
                     />
                   )
                 })
@@ -128,6 +137,7 @@ const Profile = ({
 const mapStateToProps = (state) => ({
   profileImage: state.userProfile.profileImage,
   posts: state.userProfile.data,
+  dogs: state.userProfile.dogs,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -158,7 +168,7 @@ const TitleArea = styled.View`
 `;
 
 const Content = styled.View`
-
+  padding-bottom: 20px;
 `;
 
 const Banner = styled.View`
@@ -210,7 +220,7 @@ const ButtonGroup = styled.View`
 `;
 
 const PetsContainer = styled.View`
-  padding-top: 10px;
+  padding-top: 12px;
 `;
 
 const PetItem = styled.View`

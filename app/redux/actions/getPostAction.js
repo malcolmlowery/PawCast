@@ -23,11 +23,6 @@ export const fetchPosts = () => {
     try {
       dispatch(getPostRequest())
 
-      // fireAuth.currentUser.updateProfile({
-      //   displayName: 'Pawcast',
-      //   photoURL: 'https://cdn11.bigcommerce.com/s-dpaf5pw/images/stencil/original/products/148/658/PawStencilSmallNEW__06609.1544726380.jpg?c=2'
-      // })
-
       const postsData = await fireStore
         .collection('posts')
         .orderBy('createdAt', 'desc')

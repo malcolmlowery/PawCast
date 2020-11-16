@@ -37,7 +37,7 @@ const UpdateProfile = ({ navigation }) => {
     }
   }
 
-  const onSubmit = async() => {
+  const onSubmit = async () => {
     const imageBlob = await fetch(image).then(response => response.blob());
     const urlOfImage = await fireStorage
       .ref()

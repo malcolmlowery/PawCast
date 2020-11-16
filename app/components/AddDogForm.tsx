@@ -5,12 +5,18 @@ import * as ImagePicker from 'expo-image-picker';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
+import { connect } from 'react-redux';
 import Button from './Button';
 import Text from './Text';
 import TextInput from './TextInput';
 import { ScrollView } from 'react-native-gesture-handler';
+import { createNewDog } from '../redux/actions/createDogAction';
 
-const DropDown = ({ labels, onValueChange, title }) => {
+const DropDown = ({ 
+  labels, 
+  onValueChange, 
+  title,
+}) => {
   return (
     <View style={{ marginTop: 10 }}>
     <Text fontWeight='semi-bold' fontSize={15} left={8}>{title}</Text>
@@ -32,6 +38,7 @@ const DropDown = ({ labels, onValueChange, title }) => {
 };
 
 const AddDogForm = ({ 
+  createDog,
   onPress 
 }) => {
 
@@ -59,14 +66,15 @@ const AddDogForm = ({
   ]
 
   const [image, setImage] = useState(null);
-  const [name, setName] = useState(null);
+  const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
-  const [gender, setGender] = useState(null);
+  const [breedLine, setBreedLine] = useState('');
+  const [gender, setGender] = useState('');
   const [age, setAge] = useState(null);
-  const [color, setColor] = useState(null);
-  const [earCrop, setEarCrop] = useState(null);
-  const [tailCrop, setTailCrop] = useState(null);
-  const [personality, setpPersonality] = useState(null);
+  const [color, setColor] = useState('');
+  const [earCrop, setEarCrop] = useState('');
+  const [tailCrop, setTailCrop] = useState('');
+  const [personality, setpPersonality] = useState('');
 
   const openImagePicker = async () => {
     const premissions = await ImagePicker.requestCameraPermissionsAsync();
@@ -88,11 +96,12 @@ const AddDogForm = ({
     }
   }
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     const dogFormData = {
       image,
       name,
       breed,
+      breedLine,
       gender,
       age,
       color,
@@ -101,7 +110,7 @@ const AddDogForm = ({
       personality,
     };
 
-    console.log(dogFormData)
+    createDog(dogFormData)
   }
 
   return (
@@ -122,6 +131,13 @@ const AddDogForm = ({
                     title='Breed'
                     onValueChange={(value) => setBreed(value)}
                     labels={[
+                      { label: 'Doberman', value: 'doberman' },
+                    ]} 
+                  />
+                  <DropDown 
+                    title='Breed Line'
+                    onValueChange={(value) => setBreedLine(value)}
+                    labels={[
                       { label: 'American', value: 'american' },
                       { label: 'European', value: 'european' },
                     ]} 
@@ -139,7 +155,7 @@ const AddDogForm = ({
                     title='Age (dog years)'
                     labels={numbers.map(values => values)} 
                   />
-                  <TextInput label='Color' />
+                  <TextInput label='Color' onChangeText={(text) => setColor(text)} value={color} />
                   <DropDown 
                     onValueChange={(value) => setEarCrop(value)}
                     title='Ear Crop Style'
@@ -207,7 +223,11 @@ const AddDogForm = ({
   )
 };
 
-export default AddDogForm;
+const mapDispatchToProps = (dispatch) => ({
+  createDog: (userInput) => dispatch(createNewDog(userInput))
+})
+
+export default connect(null, mapDispatchToProps)(AddDogForm);
 
 const Backdrop = styled.View`
   background: #000;

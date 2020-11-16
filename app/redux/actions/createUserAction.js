@@ -1,4 +1,4 @@
-import { fireAuth, fireStore, firebase } from '../../firebase/firebase';
+import { fireAuth, fireStorage, fireStore } from '../../firebase/firebase';
 import { 
   loginUserRequest,
   loginUserSuccess,
@@ -37,8 +37,22 @@ export const createUser = (userInput) => {
 
       await fireAuth
         .createUserWithEmailAndPassword(email, password)
-        .then(({ user }) => {
+        .then(async ({ user }) => {
           dispatch(createUserSuccess())
+
+          const imageUrl = await fireStorage
+            .ref()
+            .child('empty-profile.png')
+            .getDownloadURL()
+            .then(url => url)
+            .catch(error => console.log(error))
+
+          fireAuth.currentUser.updateProfile({
+            photoURL: imageUrl,
+            displayName: `${firstName} ${lastName}`
+          })
+          .catch(error => console.log(error))
+
           fireStore
             .collection('users')
             .add({
@@ -47,13 +61,17 @@ export const createUser = (userInput) => {
               lastName,
               email,
               zipcode,
+              profileImage: imageUrl
             })
         })
         .then(() => {
           dispatch(loginUserRequest())
+
           fireAuth
             .signInWithEmailAndPassword(email, password)
-            .then(user => dispatch(loginUserSuccess(user)))
+            .then(user => {
+              dispatch(loginUserSuccess(user))
+            })
         })
         .catch(error => dispatch(loginUserFailure(error)))
     }

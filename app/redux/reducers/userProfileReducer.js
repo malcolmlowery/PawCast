@@ -20,6 +20,7 @@ export const userProfileReducer = (state = intialState, action) => {
       return {
         ...state,
         data: action.payload.postWithComments,
+        dogs: action.payload.dogs,
         profileImage: action.payload.profileImage
       }
     }

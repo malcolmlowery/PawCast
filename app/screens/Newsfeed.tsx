@@ -136,6 +136,7 @@ const Icon = styled.Image`
 `;
 
 const Content = styled.View`
+  padding-bottom: 20px;
   position: relative;
   z-index: 9;
 `;
