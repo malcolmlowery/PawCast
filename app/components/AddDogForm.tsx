@@ -124,7 +124,7 @@ const AddDogForm = ({
             </CardHeader>
 
             <Content>
-              <ScrollView style={{ height: 250, paddingBottom: 20, marginTop: 20 }}>
+              <ScrollView style={{ height: 250, paddingBottom: 20, marginTop: 20, borderBottomColor: '#f2f2f2', borderBottomWidth: 1 }}>
                 <View style={{ paddingBottom: 20 }}>
                   <TextInput label='Name' onChangeText={(text) => setName(text)} value={name} />
                   <DropDown 
@@ -189,7 +189,6 @@ const AddDogForm = ({
               <DogImagesContainer>
                 <AddImageButton onPress={() => openImagePicker()}>
                   <Ionicons color={colors.white} name='ios-camera' size={42} />
-                  <Text color='white' fontWeight='semi-bold'>Add Image</Text>
                 </AddImageButton>
                 <DogImage source={{ uri: image }} />
               </DogImagesContainer>
@@ -274,25 +273,27 @@ const ButtonGroup = styled.View`
 
 const DogImagesContainer = styled.View`
   align-items: center;
-  background: #f7f7f7;
   border-radius: 8px;
   flex-direction: row;
   height: 150px;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 20px;
   overflow: hidden;
 `;
 
 const DogImage = styled.Image`
   background: #f5f5f5;
+  border-radius: 16px;
   height: 100%;
-  width: 65%;
+  width: 150px;
 `;
 
 const AddImageButton = styled.TouchableOpacity`
   align-items: center;
   background: ${colors.primary};
-  height: 100%;
+  border-radius: 35px;
+  height: 70px;
   justify-content: center;
-  width: 35%;
+  margin-right: 24px;
+  width: 70px;
 `;
