@@ -3,6 +3,8 @@ import {
   GET_POST_SUCCESS,
   GET_POST_FAILURE,
   CREATE_POST_SUCCESS,
+  CREATE_DOG_SUCCESS,
+  DELETE_DOG_SUCCESS,
 } from '../actions/Types';
 
 const intialState = {
@@ -21,7 +23,8 @@ export const userProfileReducer = (state = intialState, action) => {
         ...state,
         data: action.payload.postWithComments,
         dogs: action.payload.dogs,
-        profileImage: action.payload.profileImage
+        profileImage: action.payload.profileImage,
+        userInfo: action.payload.userInfo,
       }
     }
     case 'GET_USER_FAILURE': return {
@@ -97,6 +100,15 @@ export const userProfileReducer = (state = intialState, action) => {
         }
         return post
       })
+    }
+    case CREATE_DOG_SUCCESS: return {
+      ...state,
+      dogs: state.dogs.concat(action.payload),
+      dogCreated: true,
+    }
+    case DELETE_DOG_SUCCESS: return {
+      ...state,
+      dogs: state.dogs.filter(dog => dog.dogId !== action.payload)
     }
     default: return state
   }

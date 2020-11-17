@@ -9,6 +9,7 @@ import Profile from './screens/Profile';
 import Home from './screens/Home';
 import UpdateProfile from './screens/UpdateProfile';
 import { fireAuth, fireStorage } from './firebase/firebase';
+import PetDetails from './screens/PetDetails';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,7 @@ const Navigation = ({ isAuthenticated, verifyUser }) => {
           <Stack.Screen name='home' component={Home}  options={{ headerShown: false }} />
           <Stack.Screen name='profile' component={Profile} options={{ headerShown: false }} />
           <Stack.Screen name='updateProfile' component={UpdateProfile} options={{ headerShown: false }} />
+          <Stack.Screen name='petDetails' component={PetDetails} options={{ headerShown: false }} />
         </Stack.Navigator>
         </>
       }

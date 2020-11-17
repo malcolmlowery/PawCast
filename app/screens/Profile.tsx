@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
 import Text from '../components/Text';
@@ -11,10 +12,12 @@ import CreatePostForm from '../components/CreatePostForm';
 import { connect } from 'react-redux';
 import { fetchUserPosts } from '../redux/actions/userProfileAction';
 import AddDogForm from '../components/AddDogForm';
-import { fireAuth } from '../firebase/firebase';
+import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
+import uuid from 'react-uuid';
 
 const Profile = ({ 
   dogs,
+  dogCreated = null,
   navigation, 
   getUserPosts, 
   posts, 
@@ -22,6 +25,7 @@ const Profile = ({
   setCommentMode, 
   setEditPost,
   profileImage,
+  userInfo,
 }) => {
 
   useEffect(() => {
@@ -30,10 +34,34 @@ const Profile = ({
 
   const [postFormVisible, setPostFormVisible] = useState(false);
   const [addDogFormVisible, setAddDogFormVisible] = useState(false);
+  const [bannerImage, setBannerImage] = useState(null);
+
+  const openImagePicker = async () => {
+    const result: any = await ImagePicker.launchImageLibraryAsync({
+      base64: true
+    })
+
+    if(!result.cancelled) {
+      const imageBlob = await fetch(result.uri).then(res => res.blob());
+
+      fireStorage
+        .ref()
+        .child(`banners/bannerImg-${uuid()}`)
+        .put(imageBlob)
+        .then(snapshot => {
+          return snapshot.ref.getDownloadURL()
+        })
+        .then(url => {
+          const uid = fireAuth.currentUser.uid
+          fireStore.collection('users').doc('1mVKN7aDH1vOfCXTu2NK').update({ bannerImage: url })
+          setBannerImage(url)
+        })
+    }
+  }
 
   return (
     <>
-    { addDogFormVisible && <AddDogForm onPress={() => setAddDogFormVisible(!addDogFormVisible)} /> }
+    { addDogFormVisible && <AddDogForm dogCreated={() => setAddDogFormVisible(!addDogFormVisible)} onPress={() => setAddDogFormVisible(!addDogFormVisible)} /> }
     { postFormVisible && <CreatePostForm onPress={() => setPostFormVisible(!postFormVisible)} /> }
       <Container>
         <AppHeader height={100}>
@@ -56,7 +84,15 @@ const Profile = ({
         <ScrollView style={{ marginBottom: 40 }}>
           <Content>
             <Banner>
-              <BannerImage />
+              <BannerImage source={{ uri: bannerImage != null ? bannerImage : userInfo?.bannerImage }} />
+              <BannerButton onPress={() => openImagePicker()}>
+                <Ionicons 
+                  color={colors.primary} 
+                  name='ios-camera'
+                  size={34} 
+                  onPress={() => console.log('ds')}
+                />
+              </BannerButton>
             </Banner>
 
             <ProfileImageContainer>
@@ -77,11 +113,13 @@ const Profile = ({
 
             <PetsContainer>
               <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
-              <ScrollView horizontal={true} style={{ height: 130 }}>
+              <ScrollView horizontal={true} style={{ height: 130 }} showsHorizontalScrollIndicator={false}>
                 { dogs &&
                   dogs.map((dog, index) => {
                     return (
-                      <PetItem key={index}>
+                      <PetItem key={index} onPress={() => navigation.push('petDetails', {
+                        dog
+                      })}>
                         <PatImage source={{ uri: dog.images[0] }} />
                         <Text top={6}>{dog.name}</Text>
                       </PetItem>
@@ -138,6 +176,8 @@ const mapStateToProps = (state) => ({
   profileImage: state.userProfile.profileImage,
   posts: state.userProfile.data,
   dogs: state.userProfile.dogs,
+  dogCreated: state.userProfile.dogCreated,
+  userInfo: state.userProfile.userInfo,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -173,8 +213,6 @@ const Content = styled.View`
 
 const Banner = styled.View`
   background: ${colors.primary};
-  border-bottom-right-radius: 24px;
-  border-bottom-left-radius: 24px;
   height: 200px;
 `;
 
@@ -223,7 +261,7 @@ const PetsContainer = styled.View`
   padding-top: 12px;
 `;
 
-const PetItem = styled.View`
+const PetItem = styled.TouchableOpacity`
   align-items: center;
   box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
   width: 150px;
@@ -240,4 +278,16 @@ const PatImage = styled.Image`
 
 const PostsContainer = styled.View`
 
+`;
+
+const BannerButton = styled.TouchableOpacity`
+  align-items: center;
+  background: #fff;
+  border-radius: 25px;
+  bottom: 10px;
+  height: 50px;
+  justify-content: center;
+  position: absolute; 
+  right: 10px;
+  width: 50px;
 `;

@@ -10,7 +10,7 @@ import Button from './Button';
 import Text from './Text';
 import TextInput from './TextInput';
 import { ScrollView } from 'react-native-gesture-handler';
-import { createNewDog } from '../redux/actions/createDogAction';
+import { createNewDog } from '../redux/actions/dogActions';
 
 const DropDown = ({ 
   labels, 
@@ -39,7 +39,8 @@ const DropDown = ({
 
 const AddDogForm = ({ 
   createDog,
-  onPress 
+  onPress,
+  dogCreated,
 }) => {
 
   const numbers = [ 
@@ -110,7 +111,7 @@ const AddDogForm = ({
       personality,
     };
 
-    createDog(dogFormData)
+    createDog(dogFormData).then(() => dogCreated())
   }
 
   return (

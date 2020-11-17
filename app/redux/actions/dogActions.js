@@ -4,6 +4,9 @@ import {
   CREATE_DOG_REQUEST,
   CREATE_DOG_SUCCESS,
   CREATE_DOG_FAILURE,
+  DELETE_DOG_REQUEST,
+  DELETE_DOG_SUCCESS,
+  DELETE_DOG_FAILURE,
 } from './Types';
 
 const createDogRequest = () => ({
@@ -78,11 +81,58 @@ export const createNewDog = (userInput) => {
         })
         .then((doc) => {
           console.log('Created Dog!!!')
-          dispatch(createDogSuccess())
+          dispatch(createDogSuccess({
+            dogId,
+            images: [imageUrl],
+            name,
+            breed,
+            breedLine,
+            gender,
+            age,
+            color,
+            earCrop,
+            tailCrop,
+            personality,
+          }))
         })
         .catch(error => {
           console.log(error)
           dispatch(createDogFailure())
+        })
+    }
+    catch(error) {
+      console.log(error)
+    }
+  }
+}
+
+const deleteDogRequest = () => ({
+  type: DELETE_DOG_REQUEST
+});
+
+const deleteDogSuccess = (data) => ({
+  type: DELETE_DOG_SUCCESS,
+  payload: data
+});
+
+const deleteDogFailure = () => ({
+  type: DELETE_DOG_FAILURE
+});
+
+export const deleteDog = (dogId) => {
+  return async (dispatch) => {
+    try {
+      dispatch(deleteDogRequest())
+
+      await fireStore.collection('animals')
+        .where('dogId', '==', dogId)
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            doc.ref.delete()
+            console.log('Dog deleted successfully!')
+            dispatch(deleteDogSuccess(dogId))
+          })
         })
     }
     catch(error) {
