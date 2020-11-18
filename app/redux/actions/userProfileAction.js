@@ -18,7 +18,7 @@ export const getUserPostFailure = () => ({
   type: 'GET_USER_FAILURE'
 });
 
-export const fetchUserPosts = () => {
+export const fetchUserPosts = (userId) => {
   return async (dispatch) => {
     try {
       dispatch(getUserPostRequest())
@@ -27,7 +27,7 @@ export const fetchUserPosts = () => {
       
       const postsData = await fireStore
         .collection('posts')
-        .where('postOwner.uid', '==', uid)
+        .where('postOwner.uid', '==', userId)
         // .orderBy('createdAt', 'desc')
         .get()
         .then(snapshot => {
@@ -47,7 +47,7 @@ export const fetchUserPosts = () => {
       
       const dogsData = await fireStore
         .collection('animals')
-        .where('dogOwner.uid', '==', uid)
+        .where('dogOwner.uid', '==', userId)
         .get()
         .then(snapshot => {
           const dogs = [];
@@ -57,15 +57,15 @@ export const fetchUserPosts = () => {
 
       const userData = await fireStore
         .collection('users')
-        .where('uid', '==', uid)
+        .where('userId', '==', userId)
         .get()
         .then(snapshot => {
           const user = {};
           snapshot.forEach(doc => Object.assign(user, doc.data()))
           return user
         })
+
       const posts = postsData.map(post => post)
-      
       const postWithComments = posts.map(post => {
         const comments = []
         const comment = commentsData.map(comment =>{
@@ -74,13 +74,19 @@ export const fetchUserPosts = () => {
           }
           return {}
         })
-        if(posts.postId === comments.postId) {
+        if(posts.postId === comments.postId && fireAuth.currentUser.uid === post.postOwner.uid) {
           return {
             ...post,
             comments,
             commentMode: false,
             editPost: false,
             showOptions: false,
+          }
+        } else {
+          return {
+            ...post,
+            comments,
+            commentMode: false,
           }
         }
       })

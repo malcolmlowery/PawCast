@@ -38,7 +38,6 @@ export const createUser = (userInput) => {
       await fireAuth
         .createUserWithEmailAndPassword(email, password)
         .then(async ({ user }) => {
-          dispatch(createUserSuccess())
 
           const imageUrl = await fireStorage
             .ref()
@@ -53,7 +52,7 @@ export const createUser = (userInput) => {
           })
           .catch(error => console.log(error))
 
-          fireStore
+          await fireStore
             .collection('users')
             .add({
               userId: user.uid,
@@ -64,14 +63,10 @@ export const createUser = (userInput) => {
               profileImage: imageUrl
             })
         })
-        .then(() => {
+        .then((user) => {
+          dispatch(createUserSuccess())
           dispatch(loginUserRequest())
-
-          fireAuth
-            .signInWithEmailAndPassword(email, password)
-            .then(user => {
-              dispatch(loginUserSuccess(user))
-            })
+          dispatch(loginUserSuccess(user))
         })
         .catch(error => dispatch(loginUserFailure(error)))
     }

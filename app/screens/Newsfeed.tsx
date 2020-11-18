@@ -9,10 +9,11 @@ import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
 import { fireAuth } from '../firebase/firebase';
 import { createNewPost } from '../redux/actions/createPostAction';
-import { fetchPosts } from '../redux/actions/getPostAction';
+import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
 const Newsfeed: React.FC<any> = ({ 
+  addComment,
   getPosts, 
   navigation,
   posts, 
@@ -39,7 +40,7 @@ const Newsfeed: React.FC<any> = ({
             <Button color='white' expand='none' height={35}  width={100} fontSize={14} fill='danger' right={16} onPress={() => setPostFormVisible(!postFormVisible)}>
               New Post
             </Button>
-            <ProfileButton onPress={() => navigation.navigate('profile')}>
+            <ProfileButton onPress={() => navigation.navigate('profile', { uid: fireAuth.currentUser.uid })}>
               <Icon source={{ uri: fireAuth.currentUser.photoURL }} />
             </ProfileButton>
           </ButtonArea>
@@ -61,7 +62,7 @@ const Newsfeed: React.FC<any> = ({
                 postId,
                 showOptions,
               }: any = post;
-
+              
               return (
                 <Card 
                   key={index}
@@ -70,6 +71,7 @@ const Newsfeed: React.FC<any> = ({
                   imageUrl={imageUrl}
                   likes={likes}
                   commentMode={commentMode}
+                  addCommentToPost={(text) => addComment({postId, comment: text})}
                   editPost={editPost}
                   showOptions={showOptions}
                   handleShowOptions={() => setShowOptions(showOptions, postId)}
@@ -77,6 +79,10 @@ const Newsfeed: React.FC<any> = ({
                   setCommentMode={() => setCommentMode(commentMode, postId)}
                   setEditPost={() => setEditPost(editPost, postId)}
                   profileImage={postOwner.profileImage}
+                  navigateToPostDetails={() => navigation.push('postDetails', {
+                    post: post
+                  })}
+                  navigateToUserProfile={() => navigation.push('profile', { uid: postOwner.uid })}
                 />
               )
             })
@@ -95,6 +101,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getPosts: () => dispatch(fetchPosts()),
+  addComment: (commentData) => dispatch(addCommentToPost(commentData)),
   setShowOptions: (showOptions, postId) => dispatch({
     type: 'SHOW_OPTIONS_MODE',
     payload: { showOptions, postId }

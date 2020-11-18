@@ -17,19 +17,18 @@ import uuid from 'react-uuid';
 
 const Profile = ({ 
   dogs,
-  dogCreated = null,
   navigation, 
   getUserPosts, 
   posts, 
   setShowOptions, 
   setCommentMode, 
   setEditPost,
-  profileImage,
   userInfo,
+  route,
 }) => {
 
   useEffect(() => {
-    getUserPosts()
+    getUserPosts(route.params.uid)
   }, [])
 
   const [postFormVisible, setPostFormVisible] = useState(false);
@@ -53,7 +52,9 @@ const Profile = ({
         })
         .then(url => {
           const uid = fireAuth.currentUser.uid
-          fireStore.collection('users').doc('1mVKN7aDH1vOfCXTu2NK').update({ bannerImage: url })
+          fireStore.collection('users').where('userId', '==', userInfo?.userId).get().then(snapshot => {
+            snapshot.forEach(doc => doc.ref.update({ bannerImage: url }))
+          })
           setBannerImage(url)
         })
     }
@@ -84,37 +85,45 @@ const Profile = ({
         <ScrollView style={{ marginBottom: 40 }}>
           <Content>
             <Banner>
-              <BannerImage source={{ uri: bannerImage != null ? bannerImage : userInfo?.bannerImage }} />
-              <BannerButton onPress={() => openImagePicker()}>
-                <Ionicons 
-                  color={colors.primary} 
-                  name='ios-camera'
-                  size={34} 
-                  onPress={() => console.log('ds')}
-                />
-              </BannerButton>
+              <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage }} />
+              { route.params.uid === fireAuth.currentUser.uid &&
+                <BannerButton onPress={() => openImagePicker()}>
+                  <Ionicons 
+                    color={colors.primary} 
+                    name='ios-camera'
+                    size={34} 
+                    onPress={() => console.log('ds')}
+                  />
+                </BannerButton>
+              }
             </Banner>
 
             <ProfileImageContainer>
-              <ProfileImage source={{ uri: profileImage }} />
+              <ProfileImage source={{ uri: userInfo?.profileImage ? userInfo?.profileImage : fireAuth.currentUser.photoURL }} />
             </ProfileImageContainer>
 
             <UserInfo>
-              <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
+              { userInfo?.firstName ?
+                <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{userInfo?.firstName} {userInfo?.lastName}</Text> 
+                :
+                <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
+              }
               <Location>
-                <Text color='darkText' fontSize={16} fontWeight='semi-bold'>Fort Lauderdale, FL</Text>
+                <Text color='darkText' fontSize={16} fontWeight='semi-bold'>City, State - {userInfo?.zipcode}</Text>
               </Location>
             </UserInfo>
 
-            <ButtonGroup>
-              <Button color='white' expand='none' fill='primary' fontSize={14} width={170} onPress={() => setAddDogFormVisible(!addDogFormVisible)}>Add a Pet</Button>
-              <Button color='white' expand='none' fill='danger' fontSize={14} width={170}  onPress={() => setPostFormVisible(!postFormVisible)}>New Post</Button>
-            </ButtonGroup>
+            { route.params.uid === fireAuth.currentUser.uid &&
+              <ButtonGroup>
+                <Button color='white' expand='none' fill='primary' fontSize={14} width={170} onPress={() => setAddDogFormVisible(!addDogFormVisible)}>Add a Pet</Button>
+                <Button color='white' expand='none' fill='danger' fontSize={14} width={170}  onPress={() => setPostFormVisible(!postFormVisible)}>New Post</Button>
+              </ButtonGroup>
+            }
 
             <PetsContainer>
               <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
               <ScrollView horizontal={true} style={{ height: 130 }} showsHorizontalScrollIndicator={false}>
-                { dogs &&
+                { dogs ?
                   dogs.map((dog, index) => {
                     return (
                       <PetItem key={index} onPress={() => navigation.push('petDetails', {
@@ -125,6 +134,10 @@ const Profile = ({
                       </PetItem>
                     )
                   })
+                  :
+                  <PetItem>
+                    <PatImage />
+                  </PetItem>
                 }
               </ScrollView>
             </PetsContainer>
@@ -181,7 +194,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getUserPosts: () => dispatch(fetchUserPosts()),
+  getUserPosts: (uid) => dispatch(fetchUserPosts(uid)),
   setShowOptions: (showOptions, postId) => dispatch({
     type: 'SHOW_OPTIONS_MODE',
     payload: { showOptions, postId }

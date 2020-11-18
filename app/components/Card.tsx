@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
@@ -6,6 +6,7 @@ import Text from './Text';
 import Button from './Button';
 
 interface CardI {
+  addCommentToPost: (a) => void
   setShowOptions: () => void
   setEditPost: () => void
   setCommentMode: () => void
@@ -22,9 +23,12 @@ interface CardI {
   username: string
   handleShowOptions: () => void
   profileImage,
+  navigateToPostDetails: () => void
+  navigateToUserProfile: () => void
 }
 
 const Card: React.FC<CardI> = ({
+  addCommentToPost,
   setEditPost,
   username,
   commentMode,
@@ -38,11 +42,16 @@ const Card: React.FC<CardI> = ({
   handleShowOptions,
   setCommentMode,
   profileImage,
+  navigateToPostDetails,
+  navigateToUserProfile
 }) => {
+
+  const [commentText, setCommentText] = useState('');
+
   return (
     <Container>
       <Header>
-        <GroupItem>
+        <GroupItem onPress={navigateToUserProfile}>
           <Icon source={{ uri: profileImage }} />
           <Text fontSize={16} left={10} fontWeight='semi-bold'>{username ? username : 'N/A'}</Text>
         </GroupItem>
@@ -75,7 +84,7 @@ const Card: React.FC<CardI> = ({
 
       <Content>
         { !editPost ?
-          <Description>{description}</Description>
+          <Description onPress={navigateToPostDetails}>{description}</Description>
           :
           <EditDescriptionGroup>
             <DescriptionTextInput multiline={true} value={description} />
@@ -106,10 +115,10 @@ const Card: React.FC<CardI> = ({
               { comments
                 ?
                 <>
-                  <CommentIcon />
+                  <CommentIcon source={{ uri: comments?.commentOwner.profileImage }} />
                   <CommentInfo>
-                    <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments[0]?.commentOwner.name}</Text>
-                    <Text fontSize={13} left={10}>{comments[0]?.comment}</Text>
+                    <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments?.commentOwner.name}</Text>
+                    <Text fontSize={13} left={10}>{comments?.comment}</Text>
                   </CommentInfo>
                 </>
                 :
@@ -119,8 +128,8 @@ const Card: React.FC<CardI> = ({
             :
             <>
               <AddCommentContainer>
-                <TextInput multiline={true} />
-                <Button expand='none' height={36} width={80}>Post</Button>
+                <TextInput multiline={true} onChangeText={(text) => setCommentText(text)} />
+                <Button expand='none' height={36} onPress={() => addCommentToPost(commentText)} width={80}>Post</Button>
               </AddCommentContainer>
             </>
             
@@ -152,7 +161,7 @@ const Header = styled.View`
   padding-right: 10px;
 `;
 
-const GroupItem = styled.View`
+const GroupItem = styled.TouchableOpacity`
   align-items: center;
   flex-direction: row;
 `;
