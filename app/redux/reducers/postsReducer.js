@@ -1,20 +1,26 @@
+import { fireAuth } from '../../firebase/firebase';
 import {
   GET_POST_REQUEST,
   GET_POST_SUCCESS,
   GET_POST_FAILURE,
   CREATE_POST_SUCCESS,
+  DELETE_POST_SUCCESS,
+  UPDATE_POST_SUCCESS,
+  ADD_COMMENT_SUCCESS,
+  LIKE_POST_SUCCESS,
 } from '../actions/Types';
 
 const intialState = {
   errors: null,
-  isLoading: true,
+  isLoading: false,
   data: []
 }
 
 export const postReducer = (state = intialState, action) => {
   switch(action.type) {
     case GET_POST_REQUEST: return {
-
+      ...state,
+      isLoading: true,
     }
     case GET_POST_SUCCESS: {
       // console.log({
@@ -23,11 +29,13 @@ export const postReducer = (state = intialState, action) => {
       // })
       return {
         ...state,
+        isLoading: false,
         data: action.payload
       }
     }
     case GET_POST_FAILURE: return {
-      
+      ...state,
+      isLoading: false,
     }
     case CREATE_POST_SUCCESS: {
       return {
@@ -95,6 +103,62 @@ export const postReducer = (state = intialState, action) => {
             commentMode: true,
             editPost: false,
             showOptions: false,
+          }
+        }
+        return post
+      })
+    }
+    case DELETE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.filter(post => post.postId !== action.payload)
+    }
+    case UPDATE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.map(post => {
+        if(post.postId === action.payload.postId) {
+          return {
+            ...post,
+            description: action.payload.description,
+            editPost: false,
+            showOptions: false,
+          }
+        }
+        return post
+      })
+    }
+    case ADD_COMMENT_SUCCESS: {
+      console.log(action.payload)
+      return {
+        ...state,
+        data: state.data.map(post => {
+          if(post.postId === action.payload.postId) {
+            return {
+              ...post,
+              comments: [action.payload].concat(post.comments),
+              commentMode: false,
+            }
+          }
+          return post
+        })
+      }
+    }
+    case LIKE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.map(post => {
+        const { liked, postId } = action.payload;
+
+        if(liked == 'LIKED' && postId == post.postId) {
+          return {
+            ...post,
+            likes: post.likes + 1,
+            likedByCurrentUser: post.likesByUsers.find(userId => userId !== fireAuth.currentUser.uid)
+          }
+        }
+        if(liked == 'UNLIKED' && postId == post.postId) {
+          return {
+            ...post,
+            likes: post.likes - 1,
+            likedByCurrentUser: post.likesByUsers.find(userId => userId === fireAuth.currentUser.uid)
           }
         }
         return post

@@ -55,6 +55,8 @@ export const fetchPosts = () => {
           }
           return {}
         })
+
+        const currentUserId = fireAuth.currentUser.uid;
         if(posts.postId === comments.postId && fireAuth.currentUser.uid === post.postOwner.uid) {
           return {
             ...post,
@@ -63,13 +65,14 @@ export const fetchPosts = () => {
             editPost: false,
             showOptions: false,
           }
-        } else {
-          return {
-            ...post,
-            comments,
-            commentMode: false,
-          }
         }
+
+        return {
+          ...post,
+          comments,
+          commentMode: false,
+        }
+        
       })
 
       dispatch(getPostSuccess(postWithComments))
@@ -82,23 +85,21 @@ export const fetchPosts = () => {
 }
 
 export const addCommentRequest = () => ({
-  type: ADD_COMMENT_REQUEST
+  type: ADD_COMMENT_REQUEST,
 });
-
-export const addCommentSuccess = (data) => ({
-  type: ADD_COMMENT_SUCCESS,
-  payload: data
-});
-
+// export const addCommentSuccess = (data) => ({
+//   type: ADD_COMMENT_SUCCESS,
+//   payload: data
+// });
 export const addCommentFailure = () => ({
-  type: ADD_COMMENT_FAILURE
+  type: ADD_COMMENT_FAILURE,
 });
 
 export const addCommentToPost = (commentData) => {
   console.log(commentData)
   return async (dispatch) => {
     const commentId = fireStore.collection('comments').doc().id;
-    const { displayName, photoURL } = fireAuth.currentUser;
+    const { displayName, photoURL, uid } = fireAuth.currentUser;
     const { postId, comment } = commentData;
     try {
       dispatch(addCommentRequest())
@@ -109,29 +110,24 @@ export const addCommentToPost = (commentData) => {
         postId,
         commentOwner: {
           profileImage: photoURL,
-          name: displayName
+          name: displayName,
+          uid: uid
         }
       })
       .then(() => {
-        console.log({
-          commentId,
-          comment,
-          postId,
-          commentOwner: {
-            profileImage: photoURL,
-            name: displayName
+        dispatch({
+          type: ADD_COMMENT_SUCCESS,
+          payload: {
+            commentId,
+            comment,
+            postId,
+            commentOwner: {
+              profileImage: photoURL,
+              name: displayName,
+              uid: uid
+            }
           }
         })
-
-        dispatch(addCommentSuccess({
-          commentId,
-          comment,
-          postId,
-          commentOwner: {
-            profileImage: photoURL,
-            name: displayName
-          }
-        }))
       })
     }
     catch(error) {

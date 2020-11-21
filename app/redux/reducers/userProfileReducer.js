@@ -1,3 +1,4 @@
+import { fireAuth } from '../../firebase/firebase';
 import {
   GET_POST_REQUEST,
   GET_POST_SUCCESS,
@@ -5,6 +6,7 @@ import {
   CREATE_POST_SUCCESS,
   CREATE_DOG_SUCCESS,
   DELETE_DOG_SUCCESS,
+  LIKE_POST_SUCCESS,
 } from '../actions/Types';
 
 const intialState = {
@@ -16,11 +18,13 @@ const intialState = {
 export const userProfileReducer = (state = intialState, action) => {
   switch(action.type) {
     case 'GET_USER_REQUEST': return {
-
+      ...state,
+      isLoading: true,
     }
     case 'GET_USER_SUCCESS': {
       return {
         ...state,
+        isLoading: false,
         data: action.payload.postWithComments,
         dogs: action.payload.dogs,
         profileImage: action.payload.profileImage,
@@ -28,7 +32,8 @@ export const userProfileReducer = (state = intialState, action) => {
       }
     }
     case 'GET_USER_FAILURE': return {
-      
+      ...state,
+      isLoading: false,
     }
     case CREATE_POST_SUCCESS: {
       return {
@@ -109,6 +114,28 @@ export const userProfileReducer = (state = intialState, action) => {
     case DELETE_DOG_SUCCESS: return {
       ...state,
       dogs: state.dogs.filter(dog => dog.dogId !== action.payload)
+    }
+    case LIKE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.map(post => {
+        const { liked, postId } = action.payload;
+
+        if(liked == 'LIKED' && postId == post.postId) {
+          return {
+            ...post,
+            likes: post.likes + 1,
+            likedByCurrentUser: post.likesByUsers.find(userId => userId !== fireAuth.currentUser.uid)
+          }
+        }
+        if(liked == 'UNLIKED' && postId == post.postId) {
+          return {
+            ...post,
+            likes: post.likes - 1,
+            likedByCurrentUser: post.likesByUsers.find(userId => userId === fireAuth.currentUser.uid)
+          }
+        }
+        return post
+      })
     }
     default: return state
   }

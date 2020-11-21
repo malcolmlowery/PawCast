@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-import { fireAuth, fireStorage } from '../firebase/firebase';
+import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
 import AppHeader from '../components/AppHeader';
 import Button from '../components/Button';
 import { colors } from '../utils/theme';
@@ -48,6 +48,11 @@ const UpdateProfile = ({ navigation }) => {
       })
       .catch(error => console.log(error))
       
+      const uid = fireAuth.currentUser.uid;
+        console.log(uid)
+        fireStore.collection('users').doc(uid).update({ profileImage: urlOfImage })
+        console.log('DONE')
+        
     const userInput: any = {
       location,
       email,

@@ -37,7 +37,7 @@ const PostDetails = ({ navigation, route }) =>  {
 
       <ScrollView>
         <Banner>
-          <PostOwner onPress={() => navigation.push('profile', { postId })}>
+          <PostOwner onPress={() => navigation.push('profile', { uid: postOwner.uid })}>
             <PostOwnerIcon source={{ uri: postOwner.profileImage }} />
             <Text fontWeight='semi-bold'>{postOwner.name}</Text>
           </PostOwner>
@@ -64,15 +64,25 @@ const PostDetails = ({ navigation, route }) =>  {
         </Banner>
 
         <Comments>
-          <Comment>
-            <CommentOwner onPress={() => {}}>
-              <PostOwnerIcon source={{ uri: postOwner.profileImage }} />
-              <Text fontWeight='semi-bold'>Name</Text>
-            </CommentOwner>
-            <CommentDesc>
-              <Text>Comment</Text>
-            </CommentDesc>
-          </Comment>
+          { comments ? 
+            comments.map((comment, index) => {
+              return (
+                <Comment> 
+                  <CommentOwner onPress={() => navigation.push('profile', { uid: comment.commentOwner.uid })}>
+                    <PostOwnerIcon source={{ uri: comment.commentOwner.profileImage }} />
+                    <Text fontWeight='semi-bold'>{comment.commentOwner.name}</Text>
+                  </CommentOwner>
+                  <CommentDesc>
+                    <Text>{comment.comment}</Text>
+                  </CommentDesc>
+                </Comment>
+              )
+            })
+            :
+            <Comment>
+              <Text>No Comments</Text>
+            </Comment>
+          }
         </Comments>
       </ScrollView>
     </Container>
@@ -100,13 +110,11 @@ const TitleArea = styled.View`
 
 const Banner = styled.View`
   background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
-  margin: 10px;
-  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0, 0.05);
+  margin-bottom: 10px;
 `;
 
 const BannerImage = styled.Image`
-  border-radius: 16px;
   height: 250px;
 `;
 
@@ -155,6 +163,7 @@ const PostOwnerIcon = styled.Image`
 
 const Comments = styled.View`
   margin: 0 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0, 0.05);
 `;
 
 const Comment = styled.View`

@@ -9,6 +9,15 @@ import {
   CREATE_POST_FAILURE,
   CREATE_POST_REQUEST,
   CREATE_POST_SUCCESS,
+  DELETE_POST_REQUEST,
+  DELETE_POST_SUCCESS,
+  DELETE_POST_FAILURE,
+  UPDATE_POST_REQUEST,
+  UPDATE_POST_SUCCESS,
+  UPDATE_POST_FAILURE,
+  LIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
+  LIKE_POST_FAILURE,
 } from './Types';
 
 const createPostRequest = () => ({
@@ -30,7 +39,6 @@ export const createNewPost = (userInput) => {
   return async (dispatch) => {
     try {
       dispatch(createPostRequest())
-      console.log(timestamp)
       const imageBlob = await fetch(image).then(response => response.blob());
       const uid = await fireAuth.currentUser.uid
       const postId = await fireStore.collection('posts').doc().id;
@@ -48,26 +56,151 @@ export const createNewPost = (userInput) => {
 
       await fireStore
         .collection('posts')
-        .add({
+        .doc(postId)
+        .set({
           description,
           createdAt: timestamp,
           imageUrl: urlOfImage,
           postId,
           likes: 0,
+          likesByUsers: [],
           postOwner: {
             uid,
             name: userInfo.displayName,
             profileImage: userInfo.photoURL,
           },
         })
-        .then(async (snapshot) => {
-          const createdPost = await snapshot.get().then(doc => doc.data())
-          dispatch(createPostSuccess(createdPost))
+        .then(() => {
+          dispatch(createPostSuccess({
+            description,
+            createdAt: timestamp.toDate().toString(),
+            imageUrl: urlOfImage,
+            likesByUsers: [],
+            likedByCurrentUser: null,
+            postId,
+            likes: 0,
+            postOwner: {
+              uid,
+              name: userInfo.displayName,
+              profileImage: userInfo.photoURL,
+            },
+          }))
         })
         .catch(error => console.log(error))
     }
     catch(error) {
       dispatch(createPostFailure(error))
     }
+  }
+}
+
+const updatePostRequest = () => ({
+  type: UPDATE_POST_REQUEST,
+});
+const updatePostSuccess = (data) => ({
+  type: UPDATE_POST_SUCCESS,
+  payload: {
+    description: data.description,
+    postId: data.postId,
+  },
+});
+const updatePostFailure = () => ({
+  type: UPDATE_POST_FAILURE,
+});
+
+export const updatePost = (userInput) => {
+  const { description, postId } = userInput;
+  
+  return async (dispatch) => {
+    dispatch(updatePostRequest)
+    
+    fireStore
+      .collection('posts')
+      .doc(postId)
+      .update({
+        description
+      })
+      .then(() => dispatch(updatePostSuccess(userInput)))
+      .catch(error => dispatch(updatePostFailure(error)))
+  }
+}
+
+
+const deletePostRequest = () => ({
+  type: DELETE_POST_REQUEST,
+});
+const deletePostSuccess = (data) => ({
+  type: DELETE_POST_SUCCESS,
+  payload: data,
+});
+const deletePostFailure = () => ({
+  type: DELETE_POST_FAILURE,
+});
+
+export const deletePost = (postId) => {
+  return async (dispatch) => {
+    console.log(postId)
+    dispatch(deletePostRequest())
+
+    fireStore
+    .collection('posts')
+    .doc(postId)
+    .delete()
+    .then(() => dispatch(deletePostSuccess(postId)))
+    .catch(error => dispatch(deletePostFailure(error)))
+  }
+};
+
+const likePostRequest = () => ({
+  type: LIKE_POST_REQUEST,
+});
+const likePostSuccess = (data) => ({
+  type: LIKE_POST_SUCCESS,
+  payload: data,
+});
+const likePostFailure = () => ({
+  type: LIKE_POST_FAILURE,
+});
+
+export const likePost = (postId) => {
+  return async (dispatch) => {
+    dispatch(likePostRequest())
+
+    await fireStore
+      .collection('posts')
+      .doc(postId)
+      .get()
+      .then(doc => doc.data().likesByUsers)
+      .then(data => {
+        const userId = fireAuth.currentUser.uid;
+        const likedByUserId = data.find(user => user === userId)
+
+        const currentUserId = fireAuth.currentUser.uid;
+        if(likedByUserId === userId) {
+          return fireStore
+            .collection('posts')
+            .doc(postId)
+            .update({
+              likes: firebase.firestore.FieldValue.increment(-1),
+              likesByUsers: data.filter(user => user !== userId)
+            })
+            .then(() => dispatch(likePostSuccess({
+              liked: 'UNLIKED', 
+              postId,
+              likedByCurrentUser: Boolean(data.find(userLike => userLike == currentUserId)),
+            })))
+        }
+        if(likedByUserId !== userId) {
+          return fireStore
+            .collection('posts')
+            .doc(postId)
+            .update({
+              likes: firebase.firestore.FieldValue.increment(1),
+              likesByUsers: data.concat(userId)
+            })
+            .then(() => dispatch(likePostSuccess({liked: 'LIKED', postId, likedByCurrentUser: Boolean(data.find(userLike => userLike !== currentUserId))})))
+        }
+      })
+
   }
 }

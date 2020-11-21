@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/theme';
 import Text from './Text';
 import Button from './Button';
+import { Alert } from 'react-native';
 
 interface CardI {
   addCommentToPost: (a) => void
@@ -25,6 +26,11 @@ interface CardI {
   profileImage,
   navigateToPostDetails: () => void
   navigateToUserProfile: () => void
+  onPressDelete: () => void
+  onUpdatePost: (text) => void
+  onLikePost: () => void
+  postLiked: null
+  liked: any
 }
 
 const Card: React.FC<CardI> = ({
@@ -43,10 +49,40 @@ const Card: React.FC<CardI> = ({
   setCommentMode,
   profileImage,
   navigateToPostDetails,
-  navigateToUserProfile
+  navigateToUserProfile,
+  onPressDelete,
+  onUpdatePost,
+  onLikePost,
+  liked,
 }) => {
 
   const [commentText, setCommentText] = useState('');
+  const [descriptionText, setDescriptionText] = useState(description);
+
+  const onPressDeletePost = () => {
+    Alert.alert(
+      'Delete Post',
+      'Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'DELETE',
+          onPress: () => onPressDelete(),
+          style: 'destructive',
+        }
+      ]
+    )
+  }
+
+  const textLimiter = (text, limit) => {
+    if(text.length > 10) {
+      return text.substr(0, limit).concat('...')
+    }
+    return text
+  }
 
   return (
     <Container>
@@ -61,7 +97,7 @@ const Card: React.FC<CardI> = ({
             <Text fontSize={14} fontWeight='semi-bold' right={10}>{likes} Likes</Text>
             :
             <OptionsButtonGroup>
-              <Button color='danger' expand='none' fill='none' fontSize={13} width={50}>Delete</Button>
+              <Button color='danger' expand='none' fill='none' fontSize={13} width={50} onPress={() => onPressDeletePost()}>Delete</Button>
               <Button 
                 color='danger' 
                 expand='none' 
@@ -84,11 +120,13 @@ const Card: React.FC<CardI> = ({
 
       <Content>
         { !editPost ?
-          <Description onPress={navigateToPostDetails}>{description}</Description>
+          <Description onPress={navigateToPostDetails}>
+            {textLimiter(description, 220)}
+          </Description>
           :
           <EditDescriptionGroup>
-            <DescriptionTextInput multiline={true} value={description} />
-            <Button>Update</Button>
+            <DescriptionTextInput multiline={true} onChangeText={(text) => setDescriptionText(text)} value={descriptionText} />
+            <Button onPress={() => onUpdatePost(descriptionText)}>Update</Button>
           </EditDescriptionGroup>
         }
         <ImagesContainer>
@@ -97,7 +135,7 @@ const Card: React.FC<CardI> = ({
       </Content>
 
       <ActionButtons>
-        <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
+        <Button color={liked() ? 'danger' : 'primary'} fill='none' fontWeight='bold' onPress={() => onLikePost()}>Like</Button>
         <Button 
           color='primary' 
           fill='none' 
@@ -118,7 +156,7 @@ const Card: React.FC<CardI> = ({
                   <CommentIcon source={{ uri: comments?.commentOwner.profileImage }} />
                   <CommentInfo>
                     <Text fontSize={13} left={10} fontWeight='semi-bold'>{comments?.commentOwner.name}</Text>
-                    <Text fontSize={13} left={10}>{comments?.comment}</Text>
+                    <Text fontSize={13} left={10}>{textLimiter(comments?.comment, 43)}</Text>
                   </CommentInfo>
                 </>
                 :

@@ -14,17 +14,23 @@ import { fetchUserPosts } from '../redux/actions/userProfileAction';
 import AddDogForm from '../components/AddDogForm';
 import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
 import uuid from 'react-uuid';
+import { addCommentToPost } from '../redux/actions/getPostAction';
+import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
 
 const Profile = ({ 
   dogs,
   navigation, 
   getUserPosts, 
+  isLoading,
   posts, 
   setShowOptions, 
   setCommentMode, 
   setEditPost,
   userInfo,
   route,
+  addComment,
+  updatePost,
+  likePost,
 }) => {
 
   useEffect(() => {
@@ -51,7 +57,6 @@ const Profile = ({
           return snapshot.ref.getDownloadURL()
         })
         .then(url => {
-          const uid = fireAuth.currentUser.uid
           fireStore.collection('users').where('userId', '==', userInfo?.userId).get().then(snapshot => {
             snapshot.forEach(doc => doc.ref.update({ bannerImage: url }))
           })
@@ -85,33 +90,45 @@ const Profile = ({
         <ScrollView style={{ marginBottom: 40 }}>
           <Content>
             <Banner>
-              <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage }} />
+              <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage  }} />
               { route.params.uid === fireAuth.currentUser.uid &&
                 <BannerButton onPress={() => openImagePicker()}>
                   <Ionicons 
                     color={colors.primary} 
                     name='ios-camera'
                     size={34} 
-                    onPress={() => console.log('ds')}
+                    onPress={() => {}}
                   />
                 </BannerButton>
               }
             </Banner>
+            
+            { !isLoading ?
+              <ProfileImageContainer>
+                <ProfileImage source={{ uri: userInfo?.profileImage }} />
+              </ProfileImageContainer>
+              :
+              <ProfileImageContainer>
+                <ProfileImage source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/pawcast-app-6daf2.appspot.com/o/empty-profile.png?alt=media&token=4675b524-e098-4876-9f38-dabddc0bafac' }} />
+              </ProfileImageContainer>
+            }
 
-            <ProfileImageContainer>
-              <ProfileImage source={{ uri: userInfo?.profileImage ? userInfo?.profileImage : fireAuth.currentUser.photoURL }} />
-            </ProfileImageContainer>
-
-            <UserInfo>
-              { userInfo?.firstName ?
-                <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{userInfo?.firstName} {userInfo?.lastName}</Text> 
-                :
-                <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
-              }
-              <Location>
-                <Text color='darkText' fontSize={16} fontWeight='semi-bold'>City, State - {userInfo?.zipcode}</Text>
-              </Location>
-            </UserInfo>
+            { !isLoading ?
+              <UserInfo>
+                { userInfo?.firstName ?
+                  <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{userInfo?.firstName} {userInfo?.lastName}</Text> 
+                  :
+                  <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
+                }
+                <Location>
+                  <Text color='darkText' fontSize={16} fontWeight='semi-bold'>Zip Code - {userInfo?.zipcode}</Text>
+                </Location>
+              </UserInfo>
+              :
+              <UserInfo>
+                <Text>Loading...</Text>
+              </UserInfo>
+            }
 
             { route.params.uid === fireAuth.currentUser.uid &&
               <ButtonGroup>
@@ -136,7 +153,8 @@ const Profile = ({
                   })
                   :
                   <PetItem>
-                    <PatImage />
+                    <PatImage style={{ backgroundColor: colors.danger }} />
+                    <Text top={6}>No pets listed</Text>
                   </PetItem>
                 }
               </ScrollView>
@@ -156,7 +174,21 @@ const Profile = ({
                     postOwner,
                     postId,
                     showOptions,
+                    likesByUsers,
+                    likedByCurrentUser,
                   }: any = post;
+                  
+                  const liked = () => {
+                    const userLike = likesByUsers.find(userLike => userLike == fireAuth.currentUser.uid) 
+                    if(userLike == likedByCurrentUser) {
+                      console.log(false)
+                      return false
+                    }
+                    if(userLike !== likedByCurrentUser) {
+                      console.log(true)
+                      return true
+                    }
+                  }
 
                   return (
                     <Card 
@@ -165,7 +197,9 @@ const Profile = ({
                       username={postOwner.name}
                       imageUrl={imageUrl}
                       likes={likes}
+                      onLikePost={() => likePost(postId)}
                       commentMode={commentMode}
+                      addCommentToPost={(text) => addComment({postId, comment: text})}
                       editPost={editPost}
                       showOptions={showOptions}
                       handleShowOptions={() => setShowOptions(showOptions, postId)}
@@ -173,6 +207,13 @@ const Profile = ({
                       setCommentMode={() => setCommentMode(commentMode, postId)}
                       setEditPost={() => setEditPost(editPost, postId)}
                       profileImage={postOwner.profileImage}
+                      navigateToPostDetails={() => navigation.push('postDetails', {
+                        post: post
+                      })}
+                      navigateToUserProfile={() => navigation.push('profile', { uid: postOwner.uid })}
+                      onPressDelete={() => deletePost(postId)}
+                      onUpdatePost={(text) => updatePost({ description: text, postId })}
+                      liked={liked}
                     />
                   )
                 })
@@ -188,6 +229,7 @@ const Profile = ({
 const mapStateToProps = (state) => ({
   profileImage: state.userProfile.profileImage,
   posts: state.userProfile.data,
+  isLoading: state.userProfile.isLoading,
   dogs: state.userProfile.dogs,
   dogCreated: state.userProfile.dogCreated,
   userInfo: state.userProfile.userInfo,
@@ -195,6 +237,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getUserPosts: (uid) => dispatch(fetchUserPosts(uid)),
+  addComment: (commentData) => dispatch(addCommentToPost(commentData)),
+  deletePost: (postId) => dispatch(deletePost(postId)),
+  likePost: (postId) => dispatch(likePost(postId)),
   setShowOptions: (showOptions, postId) => dispatch({
     type: 'SHOW_OPTIONS_MODE',
     payload: { showOptions, postId }
@@ -206,7 +251,8 @@ const mapDispatchToProps = (dispatch) => ({
   setCommentMode: (commentMode, postId) => dispatch({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
-  })
+  }),
+  updatePost: (userInput) => dispatch(updatePost(userInput))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

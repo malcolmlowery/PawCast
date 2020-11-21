@@ -54,7 +54,8 @@ export const createUser = (userInput) => {
 
           await fireStore
             .collection('users')
-            .add({
+            .doc(user.uid)
+            .set({
               userId: user.uid,
               firstName,
               lastName,
@@ -62,11 +63,10 @@ export const createUser = (userInput) => {
               zipcode,
               profileImage: imageUrl
             })
-        })
-        .then((user) => {
-          dispatch(createUserSuccess())
-          dispatch(loginUserRequest())
-          dispatch(loginUserSuccess(user))
+
+          // dispatch(createUserSuccess())
+          // dispatch(loginUserRequest())
+          // dispatch(loginUserSuccess(user))
         })
         .catch(error => dispatch(loginUserFailure(error)))
     }

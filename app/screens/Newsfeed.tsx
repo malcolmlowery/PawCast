@@ -8,18 +8,21 @@ import Card from '../components/Card';
 import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
 import { fireAuth } from '../firebase/firebase';
-import { createNewPost } from '../redux/actions/createPostAction';
+import { createNewPost, deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
 import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
 const Newsfeed: React.FC<any> = ({ 
   addComment,
+  deletePost,
   getPosts, 
+  likePost,
   navigation,
   posts, 
   setShowOptions, 
   setCommentMode, 
   setEditPost,
+  updatePost,
 }) => {
 
   useEffect(() => {
@@ -61,8 +64,21 @@ const Newsfeed: React.FC<any> = ({
                 postOwner,
                 postId,
                 showOptions,
+                likesByUsers,
+                likedByCurrentUser
+,
               }: any = post;
               
+              const liked = () => {
+                const userLike = likesByUsers.find(userLike => userLike == fireAuth.currentUser.uid) 
+                if(userLike == likedByCurrentUser) {
+                  return false
+                }
+                if(userLike !== likedByCurrentUser) {
+                  return true
+                }
+              }
+
               return (
                 <Card 
                   key={index}
@@ -70,6 +86,7 @@ const Newsfeed: React.FC<any> = ({
                   username={postOwner.name}
                   imageUrl={imageUrl}
                   likes={likes}
+                  onLikePost={() => likePost(postId)}
                   commentMode={commentMode}
                   addCommentToPost={(text) => addComment({postId, comment: text})}
                   editPost={editPost}
@@ -83,6 +100,9 @@ const Newsfeed: React.FC<any> = ({
                     post: post
                   })}
                   navigateToUserProfile={() => navigation.push('profile', { uid: postOwner.uid })}
+                  onPressDelete={() => deletePost(postId)}
+                  onUpdatePost={(text) => updatePost({ description: text, postId })}
+                  liked={liked}
                 />
               )
             })
@@ -102,6 +122,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   getPosts: () => dispatch(fetchPosts()),
   addComment: (commentData) => dispatch(addCommentToPost(commentData)),
+  deletePost: (postId) => dispatch(deletePost(postId)),
+  likePost: (postId) => dispatch(likePost(postId)),
   setShowOptions: (showOptions, postId) => dispatch({
     type: 'SHOW_OPTIONS_MODE',
     payload: { showOptions, postId }
@@ -113,7 +135,8 @@ const mapDispatchToProps = (dispatch) => ({
   setCommentMode: (commentMode, postId) => dispatch({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
-  })
+  }),
+  updatePost: (userInput) => dispatch(updatePost(userInput))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);
