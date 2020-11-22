@@ -49,8 +49,8 @@ const PostDetails = ({ navigation, route }) =>  {
           <Description>
             <Text>{description}</Text>
           </Description>
-          <ActionButtons>
 
+          {/* <ActionButtons>
             <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
               <Button 
                 color='primary' 
@@ -60,7 +60,7 @@ const PostDetails = ({ navigation, route }) =>  {
                 width={40}>
                   Comment
             </Button>
-          </ActionButtons>
+          </ActionButtons> */}
         </Banner>
 
         <Comments>
@@ -109,7 +109,7 @@ const TitleArea = styled.View`
 `;
 
 const Banner = styled.View`
-  background: #fff;
+  background: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0, 0.05);
   margin-bottom: 10px;
 `;
@@ -126,8 +126,8 @@ const Description = styled.View`
 `;
 
 const ActionButtons = styled.View`
-border-top-width: 1px;
-border-color: #ebebeb;
+  border-top-width: 1px;
+  border-color: #ebebeb;
   flex-direction: row;
 `;
 

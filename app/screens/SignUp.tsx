@@ -21,7 +21,7 @@ const SignUp = ({ createNewUser, navigation }) => {
   const [zipcode, setZipcode] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [image, setImage] = useState(null);
-
+  
   const openImagePicker = async () => {
     const premissions = await ImagePicker.requestCameraPermissionsAsync();
     const result: any = await ImagePicker.launchImageLibraryAsync({

@@ -51,6 +51,8 @@ const UpdateProfile = ({ navigation }) => {
       const uid = fireAuth.currentUser.uid;
         console.log(uid)
         fireStore.collection('users').doc(uid).update({ profileImage: urlOfImage })
+        fireStore.collection('user_locations').doc(uid).update({ profileImage: urlOfImage })
+        fireStore.collection('posts').doc(uid).update({ profileImage: urlOfImage })
         console.log('DONE')
         
     const userInput: any = {

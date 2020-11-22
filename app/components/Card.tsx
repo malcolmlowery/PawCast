@@ -135,9 +135,9 @@ const Card: React.FC<CardI> = ({
       </Content>
 
       <ActionButtons>
-        <Button color={liked() ? 'danger' : 'primary'} fill='none' fontWeight='bold' onPress={() => onLikePost()}>Like</Button>
+        <Button color={liked() ? 'alert' : 'darkText'} fill='none' fontWeight='bold' onPress={() => onLikePost()}>Like</Button>
         <Button 
-          color='primary' 
+          color='darkText' 
           fill='none' 
           fontWeight='bold' 
           onPress={() => setCommentMode()} 

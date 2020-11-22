@@ -7,6 +7,7 @@ import { logoutUser } from '../redux/actions/logoutUserAction';
 import AppHeader from '../components/AppHeader';
 import Button from '../components/Button';
 import Text from '../components/Text';
+import { fireAuth } from '../firebase/firebase';
 
 const Settings = ({ logout, navigation }) => {
   return (
@@ -27,31 +28,24 @@ const Settings = ({ logout, navigation }) => {
 
         <ButtonGroup>
           <CircleButtonItem>
-            <CircleButtonIcon onPress={() => navigation.navigate('profile')}>
+            <CircleButtonIcon onPress={() => navigation.navigate('profile', { uid: fireAuth.currentUser.uid })}>
               <Ionicons name='md-person' color='#fff' size={32} />
             </CircleButtonIcon>
             <CircleButtonLabel>Profile</CircleButtonLabel>
           </CircleButtonItem>
 
           <CircleButtonItem>
-            <CircleButtonIcon>
+            <CircleButtonIcon onPress={() => navigation.push('mapView')}>
               <Ionicons name='ios-pin' color='#fff' size={32} />
             </CircleButtonIcon>
-            <CircleButtonLabel>Map</CircleButtonLabel>
-          </CircleButtonItem>
-
-          <CircleButtonItem>
-            <CircleButtonIcon>
-              <Ionicons name='ios-paw' color='#fff' size={32} />
-            </CircleButtonIcon>
-            <CircleButtonLabel>My Pets</CircleButtonLabel>
+            <CircleButtonLabel>Dog Map</CircleButtonLabel>
           </CircleButtonItem>
 
           <CircleButtonItem>
             <CircleButtonIcon onPress={() => navigation.push('updateProfile')}>
               <Ionicons name='ios-construct' color='#fff' size={32} />
             </CircleButtonIcon>
-            <CircleButtonLabel style={{ color: colors.danger }}>Update Profile</CircleButtonLabel>
+            <CircleButtonLabel>Update Profile</CircleButtonLabel>
           </CircleButtonItem>
         </ButtonGroup>
       </Content>

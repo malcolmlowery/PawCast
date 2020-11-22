@@ -121,7 +121,7 @@ const Profile = ({
                   <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
                 }
                 <Location>
-                  <Text color='darkText' fontSize={16} fontWeight='semi-bold'>Zip Code - {userInfo?.zipcode}</Text>
+                  <Text color='darkText' fontSize={16} fontWeight='semi-bold'>{userInfo.city}, {userInfo.state} - {userInfo?.zipcode}</Text>
                 </Location>
               </UserInfo>
               :

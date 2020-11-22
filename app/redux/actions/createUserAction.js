@@ -35,10 +35,20 @@ export const createUser = (userInput) => {
     try {
       dispatch(createUserRequest())
 
+      const userLocation = await fetch(`https://www.zipcodeapi.com/rest/niyP3JoucMGPEZD1CL8BoKxaK3EvM3exV2iN7Oy6mdwficFEM4Pj6Lnb1dpQNOQs/info.json/${zipcode}/degrees`)
+        .then(res => res.json())
+        .then(data => data);
+
+      const {
+        lat,
+        lng,
+        city,
+        state,
+      } = userLocation;
+
       await fireAuth
         .createUserWithEmailAndPassword(email, password)
         .then(async ({ user }) => {
-
           const imageUrl = await fireStorage
             .ref()
             .child('empty-profile.png')
@@ -61,12 +71,31 @@ export const createUser = (userInput) => {
               lastName,
               email,
               zipcode,
-              profileImage: imageUrl
+              profileImage: imageUrl,
+              city,
+              state,
             })
 
-          // dispatch(createUserSuccess())
-          // dispatch(loginUserRequest())
-          // dispatch(loginUserSuccess(user))
+          await fireStore
+            .collection('user_locations')
+            .doc(user.uid)
+            .set({
+              firstName,
+              lastName,
+              lat,
+              lng,
+              zipcode,
+              city,
+              state,
+              uid: user.uid,
+              profileImage: imageUrl,
+            })
+
+        })
+        .then(() => {
+          dispatch(createUserSuccess())
+          dispatch(loginUserRequest())
+          dispatch(loginUserSuccess(user))
         })
         .catch(error => dispatch(loginUserFailure(error)))
     }
