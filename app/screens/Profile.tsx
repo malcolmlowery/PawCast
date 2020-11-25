@@ -16,8 +16,11 @@ import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
 import uuid from 'react-uuid';
 import { addCommentToPost } from '../redux/actions/getPostAction';
 import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { createMessage, getMessages } from '../redux/actions/messagesActions';
 
 const Profile = ({ 
+  createMessage,
+  getMessages,
   dogs,
   navigation, 
   getUserPosts, 
@@ -83,7 +86,19 @@ const Profile = ({
             color={colors.primary} 
             name='ios-mail' 
             size={32} 
-            onPress={() => navigation.navigate('profile')}
+            onPress={() => {
+              const userData = {
+                city: userInfo.city,
+                firstName: userInfo.firstName,
+                lastName: userInfo.lastName,
+                profileImage: userInfo.profileImage,
+                state: userInfo.state,
+                userId: userInfo.userId,
+                zipcode: userInfo.zipcode,
+              };
+              navigation.push('messages')
+              // createMessage(userData)
+            }}
           />
         </AppHeader>
 
@@ -252,7 +267,9 @@ const mapDispatchToProps = (dispatch) => ({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
   }),
-  updatePost: (userInput) => dispatch(updatePost(userInput))
+  updatePost: (userInput) => dispatch(updatePost(userInput)),
+  createMessage: (userInfo) => dispatch(createMessage(userInfo)),
+  getMessages: () => dispatch(getMessages())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

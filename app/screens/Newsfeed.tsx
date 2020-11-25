@@ -8,7 +8,7 @@ import Card from '../components/Card';
 import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
 import { fireAuth } from '../firebase/firebase';
-import { createNewPost, deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
 import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
@@ -136,7 +136,7 @@ const mapDispatchToProps = (dispatch) => ({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
   }),
-  updatePost: (userInput) => dispatch(updatePost(userInput))
+  updatePost: (userInput) => dispatch(updatePost(userInput)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);

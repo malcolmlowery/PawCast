@@ -19,13 +19,13 @@ export const loginUserFailure = () => ({
 });
 
 export const loginUser = (email, password) => {
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch(loginUserRequest())
     try{
-      fireAuth
+      await fireAuth
         .signInWithEmailAndPassword(email.trim(), password.trim())
         .then(() => dispatch(loginUserSuccess()))
-        .catch(error => dispatch(loginUserFailure(error)))
+        .catch(error => console.log(error))
     }
     catch(error) {
       dispatch(loginUserFailure(error))

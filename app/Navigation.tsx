@@ -12,6 +12,7 @@ import { fireAuth, fireStorage } from './firebase/firebase';
 import PetDetails from './screens/PetDetails';
 import PostDetails from './screens/PostDetails';
 import MapView from './screens/MapView';
+import ChatRoom from './screens/ChatRoom';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +21,7 @@ const Navigation = ({ isAuthenticated, verifyUser }) => {
   useEffect(() => {
     verifyUser()
   }, [])
-
+  
   return (
     <NavigationContainer>
       {
@@ -38,6 +39,7 @@ const Navigation = ({ isAuthenticated, verifyUser }) => {
           <Stack.Screen name='petDetails' component={PetDetails} options={{ headerShown: false }} />
           <Stack.Screen name='postDetails' component={PostDetails} options={{ headerShown: false }} />
           <Stack.Screen name='mapView' component={MapView} options={{ headerShown: false }} />
+          <Stack.Screen name='chatroom' component={ChatRoom} options={{ headerShown: false }} />
         </Stack.Navigator>
         </>
       }
