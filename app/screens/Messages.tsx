@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import Text from '../components/Text';
 import AppHeader from '../components/AppHeader';
-import { getMessages } from '../redux/actions/messagesActions';
 import { colors } from '../utils/theme';
+import { ScrollView } from 'react-native-gesture-handler';
+import { getMessages } from '../redux/actions/messageActions';
 
 const Messages = ({
   getMessages,
@@ -22,36 +23,38 @@ const Messages = ({
       <AppHeader>
         <Text color='primary' fontSize={28} fontWeight='semi-bold'>Messages</Text>
       </AppHeader>
+      <ScrollView style={{ marginTop: 3 }}>
+        { messages &&
+          messages.map((message, index) => {
+            // console.log(message.userInfo[1])
+            const { firstName, lastName, profileImage, userId } = message.userInfo[1];
 
-      { messages &&
-        messages.map((message, index) => {
+            return (
+              <ItemGroup key={index} onPress={() => {
+                navigation.navigate('chatroom', {
+                  message_session_id: message.message_session_id,
+                  userId: message.userId,
+                })
+              }}>
+                <ItemLabel>
+                  <UserAvatar source={{ uri: profileImage }} />
+                  <Text fontSize={15} fontWeight='semi-bold'>{firstName} {lastName}</Text>
+                </ItemLabel>
+                <Message>
 
-          const { firstName, lastName, profileImage } = message?.otherUser;
-
-          return (
-            <ItemGroup key={index} onPress={() => {
-              navigation.push('chatroom', {
-                message_session_id: message.message_session_id
-              })
-            }}>
-              <ItemLabel>
-                <UserAvatar source={{ uri: profileImage }} />
-                <Text fontWeight='semi-bold'>{firstName} {lastName}</Text>
-              </ItemLabel>
-              <Message>
-
-              </Message>
-            </ItemGroup>
-          )
-        })
-      }
+                </Message>
+              </ItemGroup>
+            )
+          })
+        }
+      </ScrollView>
 
     </Container>
   )
 };
 
 const mapStateToProps = (state) =>({
-  messages: state.messages.data
+  messages: state.message_session.messages,
 });
 
 const mapDispatchToProps = (dispatch) =>({
@@ -71,9 +74,9 @@ const TitleArea = styled.View`
 
 const ItemGroup = styled.TouchableOpacity`
   background: #fff;
+  margin: 3px 10px;
   padding: 8px;
-  border-bottom-width: 1px;
-  border-color: #e1e1e1;
+  border-radius: 8px;
 `;
 
 const ItemLabel = styled.View`
@@ -83,8 +86,8 @@ const ItemLabel = styled.View`
 
 const UserAvatar = styled.Image`
   border-radius: 18px;
-  height: 30px;
-  width: 30px;
+  height: 36px;
+  width: 36px;
   margin-right: 10px;
 `;
 

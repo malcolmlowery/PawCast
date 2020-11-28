@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { chatroomReducer } from './chatroomReducer';
 import { loginUserReducer } from './loginUserReducer';
+import { messageSessionReducer } from './messageSessionReducer';
 import { messagesReducer } from './messagesReducer';
 import { postReducer } from './postsReducer';
 import { userLocationsReducer } from './userLocationsReducer';
@@ -13,4 +14,5 @@ export const reducers = combineReducers({
   userLocationsData: userLocationsReducer,
   messages: messagesReducer,
   chatroom: chatroomReducer,
+  message_session: messageSessionReducer,
 })

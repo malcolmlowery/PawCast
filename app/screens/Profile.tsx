@@ -16,11 +16,8 @@ import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
 import uuid from 'react-uuid';
 import { addCommentToPost } from '../redux/actions/getPostAction';
 import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
-import { createMessage, getMessages } from '../redux/actions/messagesActions';
 
-const Profile = ({ 
-  createMessage,
-  getMessages,
+const Profile = ({
   dogs,
   navigation, 
   getUserPosts, 
@@ -86,19 +83,7 @@ const Profile = ({
             color={colors.primary} 
             name='ios-mail' 
             size={32} 
-            onPress={() => {
-              const userData = {
-                city: userInfo.city,
-                firstName: userInfo.firstName,
-                lastName: userInfo.lastName,
-                profileImage: userInfo.profileImage,
-                state: userInfo.state,
-                userId: userInfo.userId,
-                zipcode: userInfo.zipcode,
-              };
-              navigation.push('messages')
-              // createMessage(userData)
-            }}
+            onPress={() => navigation.push('messages')}
           />
         </AppHeader>
 
@@ -145,11 +130,33 @@ const Profile = ({
               </UserInfo>
             }
 
-            { route.params.uid === fireAuth.currentUser.uid &&
+            { route.params.uid === fireAuth.currentUser.uid ?
               <ButtonGroup>
                 <Button color='white' expand='none' fill='primary' fontSize={14} width={170} onPress={() => setAddDogFormVisible(!addDogFormVisible)}>Add a Pet</Button>
                 <Button color='white' expand='none' fill='danger' fontSize={14} width={170}  onPress={() => setPostFormVisible(!postFormVisible)}>New Post</Button>
               </ButtonGroup>
+              :
+              <SingleButton>
+                <Button 
+                  color='white' 
+                  expand='none' 
+                  fill='primary' 
+                  fontSize={14} 
+                  width={170}  
+                  onPress={() => navigation.push('chatroom', { 
+                    message_session_id: null ,
+                    city: userInfo.city,
+                    firstName: userInfo.firstName,
+                    lastName: userInfo.lastName,
+                    profileImage: userInfo.profileImage,
+                    state: userInfo.state,
+                    userId: userInfo.userId,
+                    zipcode: userInfo.zipcode,
+                  })}
+                >
+                  Send Message
+                </Button>
+              </SingleButton>
             }
 
             <PetsContainer>
@@ -267,9 +274,7 @@ const mapDispatchToProps = (dispatch) => ({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
   }),
-  updatePost: (userInput) => dispatch(updatePost(userInput)),
-  createMessage: (userInfo) => dispatch(createMessage(userInfo)),
-  getMessages: () => dispatch(getMessages())
+  updatePost: (userInput) => dispatch(updatePost(userInput))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
@@ -331,6 +336,11 @@ const ButtonGroup = styled.View`
   flex-direction: row;
   padding: 10px;
   justify-content: space-evenly;
+`;
+
+const SingleButton = styled.View`
+  align-items: center;
+  margin-top: 10px;
 `;
 
 const PetsContainer = styled.View`

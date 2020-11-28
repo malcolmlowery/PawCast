@@ -1,3 +1,4 @@
+import uuid from "react-uuid";
 import { fireAuth, fireStore } from "../../firebase/firebase";
 
 const GET_MESSAGES_REQUEST = 'GET_MESSAGES_REQUEST';
@@ -81,8 +82,22 @@ export const createMessage = (userInfo) => {
           ],
           otherUser: userInfo
         })
+      
+      await fireStore
+        .collection(`messages/${message_session_id}/chats`)
+        .doc()
+        .set({
+          _id: uuid(), 
+          text: 'TEST', 
+          createdAt: Date.now(), 
+          user: { 
+            avatar: fireAuth.currentUser.photoURL, 
+            name: fireAuth.currentUser.displayName, 
+            _id: fireAuth.currentUser.uid 
+          }
+        })
 
-      dispatch(createMessageSuccess())
+      dispatch(createMessageSuccess(message_session_id))
     }
     catch(error) {
       dispatch(createMessageFailure(error))
