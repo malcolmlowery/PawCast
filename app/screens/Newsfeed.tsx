@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { RefreshControl } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
@@ -9,6 +10,7 @@ import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
 import { fireAuth } from '../firebase/firebase';
 import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { getAllDobermannsByCount } from '../redux/actions/dobermanCountActions';
 import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
 import { colors } from '../utils/theme';
 
@@ -16,6 +18,8 @@ const Newsfeed: React.FC<any> = ({
   addComment,
   deletePost,
   getPosts, 
+  getAllDobermanns,
+  isLoading,
   likePost,
   navigation,
   posts, 
@@ -27,14 +31,20 @@ const Newsfeed: React.FC<any> = ({
 
   useEffect(() => {
     getPosts()
+    // getAllDobermanns()
   }, [])
 
   const [postFormVisible, setPostFormVisible] = useState(false);
 
   return (
     <>
-
-      { postFormVisible && <CreatePostForm onPress={() => setPostFormVisible(!postFormVisible)} /> }
+      
+      { 
+        postFormVisible &&
+        <CreatePostForm 
+          visible={() => setPostFormVisible(!postFormVisible)}
+        /> 
+      }
 
       <Container>
         <AppHeader>
@@ -49,7 +59,14 @@ const Newsfeed: React.FC<any> = ({
           </ButtonArea>
         </AppHeader>
 
-        <ScrollView>
+        <ScrollView 
+          refreshControl={
+            <RefreshControl 
+              refreshing={isLoading} 
+              onRefresh={getPosts}
+            />
+          }
+        >
           <Content>
           { posts &&
             posts.map((post, index) => {
@@ -103,6 +120,10 @@ const Newsfeed: React.FC<any> = ({
                   onPressDelete={() => deletePost(postId)}
                   onUpdatePost={(text) => updatePost({ description: text, postId })}
                   liked={liked}
+                  navFromComment={() => navigation.push('postDetails', {
+                    post: post
+                  })}
+                  uid={postOwner.uid}
                 />
               )
             })
@@ -115,6 +136,7 @@ const Newsfeed: React.FC<any> = ({
 };
 
 const mapStateToProps = (state) => ({
+  isLoading: state.posts.isLoading,
   posts: state.posts.data,
   profileImage: state.userProfile.profileImage,
 })
@@ -136,7 +158,12 @@ const mapDispatchToProps = (dispatch) => ({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
   }),
+  createPostMode: (createPostMode) => dispatch({
+    type: 'CREATE_POST_MODE',
+    payload: createPostMode,
+  }),
   updatePost: (userInput) => dispatch(updatePost(userInput)),
+  getAllDobermanns: () => dispatch(getAllDobermannsByCount())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);

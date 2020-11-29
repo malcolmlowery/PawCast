@@ -35,9 +35,13 @@ export const createUser = (userInput) => {
     try {
       dispatch(createUserRequest())
 
-      const userLocation = await fetch(`https://www.zipcodeapi.com/rest/niyP3JoucMGPEZD1CL8BoKxaK3EvM3exV2iN7Oy6mdwficFEM4Pj6Lnb1dpQNOQs/info.json/${zipcode}/degrees`)
+      const userLocation = await fetch(`https://www.zipcodeapi.com/rest/9q7SAY4YYXHIEyW0rhoX8bw6E4f1y3vUHifq6I866thMNHyxgRRbhBiOk2MpU3Rd/info.json/${zipcode}/degrees`)
         .then(res => res.json())
-        .then(data => data);
+        .then(data => {
+          console.log(data)
+          return data
+        })
+        .catch(error => console.log(error));
 
       const {
         lat,
@@ -91,8 +95,6 @@ export const createUser = (userInput) => {
               profileImage: imageUrl,
             })
 
-        })
-        .then(() => {
           dispatch(createUserSuccess())
           dispatch(loginUserRequest())
           dispatch(loginUserSuccess(user))

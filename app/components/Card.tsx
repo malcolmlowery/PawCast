@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
+import { Video } from 'expo-av';
 import { colors } from '../utils/theme';
 import Text from './Text';
 import Button from './Button';
 import { Alert } from 'react-native';
+import { fireAuth } from '../firebase/firebase';
 
 interface CardI {
   addCommentToPost: (a) => void
@@ -31,6 +33,8 @@ interface CardI {
   onLikePost: () => void
   postLiked: null
   liked: any
+  navFromComment: () => void
+  uid: string
 }
 
 const Card: React.FC<CardI> = ({
@@ -54,6 +58,8 @@ const Card: React.FC<CardI> = ({
   onUpdatePost,
   onLikePost,
   liked,
+  navFromComment,
+  uid,
 }) => {
 
   const [commentText, setCommentText] = useState('');
@@ -78,8 +84,8 @@ const Card: React.FC<CardI> = ({
   }
 
   const textLimiter = (text, limit) => {
-    if(text.length > 10) {
-      return text.substr(0, limit).concat('...')
+    if(text.length > limit) {
+      return text.substr(0, limit).trim(' ').concat('...')
     }
     return text
   }
@@ -109,12 +115,14 @@ const Card: React.FC<CardI> = ({
               </Button>
             </OptionsButtonGroup>
           }
-          <Ionicons 
-            color={colors.primary} 
-            name='ios-options' 
-            size={24} 
-            onPress={() => handleShowOptions()} 
-          />
+          { fireAuth.currentUser.uid === uid &&
+            <Ionicons 
+              color={colors.primary} 
+              name='ios-options' 
+              size={24} 
+              onPress={() => handleShowOptions()} 
+            />  
+          }
         </GroupItem>
       </Header>
 
@@ -129,9 +137,21 @@ const Card: React.FC<CardI> = ({
             <Button onPress={() => onUpdatePost(descriptionText)}>Update</Button>
           </EditDescriptionGroup>
         }
-        <ImagesContainer>
-          <Image source={{ uri: imageUrl }} />
-        </ImagesContainer>
+        { imageUrl !== '' &&
+          <ImagesContainer>
+            <Image source={{ uri: imageUrl }} />
+          </ImagesContainer>
+          
+          // <Video 
+          //   source={{ uri: imageUrl }}
+          //   rate={1.0}
+          //   volume={1.0}
+          //   resizeMode='contain'
+          //   isLooping={true}
+          //   shouldPlay
+          //   style={{ height:300, width: 100 }}
+          // />
+        }
       </Content>
 
       <ActionButtons>
@@ -147,7 +167,7 @@ const Card: React.FC<CardI> = ({
       </ActionButtons>
 
       <CommentSection>
-        <GroupItem>
+        <GroupItem onPress={() => navFromComment()}>
           { !commentMode ?
             <>
               { comments
@@ -237,6 +257,8 @@ const Image = styled.Image`
 
 const ActionButtons = styled.View`
   flex-direction: row;
+  border-top-width: 1px;
+  border-color: #ebebeb;
 `;
 
 const CommentSection = styled.View`

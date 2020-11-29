@@ -7,6 +7,7 @@ import Newsfeed from './Newsfeed';
 import Notifications from './Notifications';
 import Settings from './Settings';
 import Messages from './Messages';
+import MapView from './MapView';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +19,7 @@ const Home = () => {
 
           switch(route.name) {
             case 'newsfeed': return <Ionicons name='ios-paper' color={focused ? colors.primary : '#c9c9c9'} size={22} />
-            case 'notifications': return <Ionicons name='ios-notifications' color={focused ? colors.primary :  '#c9c9c9'} size={24} />
+            case 'map': return <Ionicons name='ios-map' color={focused ? colors.primary :  '#c9c9c9'} size={24} />
             case 'settings': return <Ionicons name='ios-settings' color={focused ? colors.primary: '#c9c9c9'} size={24} />
             case 'messages': return <Ionicons name='ios-mail' color={focused ? colors.primary: '#c9c9c9'} size={24} />
           }
@@ -30,8 +31,8 @@ const Home = () => {
       }}
     >
       <Tab.Screen name='newsfeed' component={Newsfeed}/>
-      <Tab.Screen name='notifications' component={Notifications}/>
       <Tab.Screen name='messages' component={Messages}/>
+      <Tab.Screen name='map' component={MapView}/>
       <Tab.Screen name='settings' component={Settings}/>
     </Tab.Navigator>
   )

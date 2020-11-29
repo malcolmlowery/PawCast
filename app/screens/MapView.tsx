@@ -1,27 +1,32 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
-import { Dimensions, Image } from 'react-native';
+import { Dimensions, Image, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReactMapView from 'react-native-maps';
 import { connect } from 'react-redux';
-import { Marker, Circle, Callout } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
 import AppHeader from '../components/AppHeader';
 import Text from '../components/Text';
 import { colors } from '../utils/theme';
 import { fireAuth } from '../firebase/firebase';
 import { getUserLocations } from '../redux/actions/userLocationActions';
+import { getAllDobermannsByCount } from '../redux/actions/dobermanCountActions';
+import { ScrollView } from 'react-native-gesture-handler';
 
-const screenHeight = Dimensions.get('screen').height;
 const screenWidth = Dimensions.get('screen').width;
 
 const MapView = ({ 
+  dobermannTotal,
+  dobermannIsLoading,
   getUserLocations,
+  getAllDobermanns,
   locations,
   navigation 
 }) => {
 
   useEffect(() => {
     getUserLocations()
+    getAllDobermanns()
   }, [])
 
   const currentUserLoc = locations.find(userLoc => userLoc.uid === fireAuth.currentUser.uid)
@@ -29,15 +34,21 @@ const MapView = ({
   return (
     <Container>
       <AppHeader>
-        <TitleArea onStartShouldSetResponder={() => navigation.pop()}>
-          <Ionicons 
-            color={colors.primary} 
-            name='ios-arrow-back' 
-            size={30} 
-          />
-          <Text color='primary' fontSize={18} fontWeight='semi-bold' left={10}>Back</Text>
-        </TitleArea>
+        <Text color='primary' fontSize={28} fontWeight='semi-bold'>Map View</Text>
       </AppHeader>
+
+      <ScrollView
+        refreshControl={
+          <RefreshControl 
+            refreshing={dobermannIsLoading} 
+            onRefresh={getAllDobermanns}
+          /> 
+        }
+      >
+      <HeaderContainer>
+        <Text fontSize={24} color='darkText' fontWeight='semi-bold'>There are {dobermannTotal} Dobermanns</Text>
+        <Text fontSize={24} color='darkText' fontWeight='bold'>on Pawcast!</Text>
+      </HeaderContainer>
 
       { locations !== undefined &&
         <Map>
@@ -54,8 +65,9 @@ const MapView = ({
               } 
             }} 
             style={{ 
-              height: screenHeight, 
-              width: screenWidth 
+              height: 500, 
+              width: screenWidth - 20,
+              borderRadius: 30
             }}
           >
             { locations &&
@@ -87,6 +99,7 @@ const MapView = ({
           </ReactMapView>
         </Map>
       }
+      </ScrollView>
 
     </Container>
   )
@@ -95,11 +108,14 @@ const MapView = ({
 const mapStateToProps = (state) => ({
   isLoading: state.userLocationsData.isLoading,
   locations: state.userLocationsData.data,
-  error: state.userLocationsData.error
+  error: state.userLocationsData.error,
+  dobermannTotal: state.dobermannCounter.total,
+  dobermannIsLoading: state.dobermannCounter.isLoading,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getUserLocations: () => dispatch(getUserLocations())
+  getUserLocations: () => dispatch(getUserLocations()),
+  getAllDobermanns: () => dispatch(getAllDobermannsByCount())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapView);
@@ -114,6 +130,14 @@ const TitleArea = styled.View`
 `;
 
 const Map = styled.View`
-  height: 200px;
-  width: 200px;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  box-shadow: 0 4px 24px rgba(0,0,0, 0.1);
+`;
+
+const HeaderContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
 `;

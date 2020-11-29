@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import Text from '../components/Text';
@@ -6,13 +6,15 @@ import AppHeader from '../components/AppHeader';
 import { colors } from '../utils/theme';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getMessages } from '../redux/actions/messageActions';
+import { RefreshControl } from 'react-native';
+import { fireAuth } from '../firebase/firebase';
 
 const Messages = ({
   getMessages,
   messages,
   navigation,
 }) => {
-
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     getMessages()
   }, [])
@@ -23,12 +25,15 @@ const Messages = ({
       <AppHeader>
         <Text color='primary' fontSize={28} fontWeight='semi-bold'>Messages</Text>
       </AppHeader>
-      <ScrollView style={{ marginTop: 3 }}>
+      <ScrollView style={{ marginTop: 3 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={getMessages} />}>
         { messages &&
           messages.map((message, index) => {
             // console.log(message.userInfo[1])
             const { firstName, lastName, profileImage, userId } = message.userInfo[1];
 
+            const userInfo = message.userInfo.find(user => user.userId !== fireAuth.currentUser.uid)
+          //  console.log(userInfo)
+          
             return (
               <ItemGroup key={index} onPress={() => {
                 navigation.navigate('chatroom', {
@@ -37,8 +42,8 @@ const Messages = ({
                 })
               }}>
                 <ItemLabel>
-                  <UserAvatar source={{ uri: profileImage }} />
-                  <Text fontSize={15} fontWeight='semi-bold'>{firstName} {lastName}</Text>
+                  <UserAvatar source={{ uri: userInfo.profileImage }} />
+                  <Text fontSize={15} fontWeight='semi-bold'>{userInfo.firstName} {userInfo.lastName}</Text>
                 </ItemLabel>
                 <Message>
 

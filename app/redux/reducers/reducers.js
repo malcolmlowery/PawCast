@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { chatroomReducer } from './chatroomReducer';
+import { dobermannCounterReducer } from './dobermannCounterReducer';
 import { loginUserReducer } from './loginUserReducer';
 import { messageSessionReducer } from './messageSessionReducer';
 import { messagesReducer } from './messagesReducer';
@@ -15,4 +16,5 @@ export const reducers = combineReducers({
   messages: messagesReducer,
   chatroom: chatroomReducer,
   message_session: messageSessionReducer,
+  dobermannCounter: dobermannCounterReducer,
 })

@@ -8,6 +8,7 @@ import AppHeader from '../components/AppHeader';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import { deleteDog } from '../redux/actions/dogActions';
+import { fireAuth } from '../firebase/firebase';
 
 const PetDetails = ({ deleteDog, navigation, route }) => {
 
@@ -51,22 +52,24 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
           <BannerImage source={{ uri: images[0] }} />
         </Banner>
 
-        <ButtonGroup>
-          { !editMode ? 
-            <Button expand='none' width={120} onPress={() => setEditMode(!editMode)}>
-              Edit
-            </Button>
-            :
-            <>
-              <Button fill='primary' expand='none' onPress={() => setEditMode(!editMode)} width={120}>
-                DONE
+        { dogOwner.uid === fireAuth.currentUser.uid &&
+          <ButtonGroup>
+            { !editMode ? 
+              <Button expand='none' width={120} onPress={() => setEditMode(!editMode)}>
+                Edit
               </Button>
-              <Button fill='danger' expand='none' onPress={() => deleteDog(dogId).then(() => navigation.pop())} width={120}>
-                Delete {name}
-              </Button>
-            </>
-          }
-        </ButtonGroup>
+              :
+              <>
+                <Button fill='primary' expand='none' onPress={() => setEditMode(!editMode)} width={120}>
+                  DONE
+                </Button>
+                <Button fill='danger' expand='none' onPress={() => deleteDog(dogId).then(() => navigation.pop())} width={120}>
+                  Delete {name}
+                </Button>
+              </>
+            }
+          </ButtonGroup>
+        }
 
         <Content>
           <DogInfoGroup>

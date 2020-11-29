@@ -20,6 +20,7 @@ const PostDetails = ({ navigation, route }) =>  {
     postOwner,
     postId,
     showOptions,
+    showCommentOptions,
   } = route.params.post;
 
   return (
@@ -67,7 +68,7 @@ const PostDetails = ({ navigation, route }) =>  {
           { comments ? 
             comments.map((comment, index) => {
               return (
-                <Comment> 
+                <Comment onPress={() => showCommentOptions(comment.commentId, true)}> 
                   <CommentOwner onPress={() => navigation.push('profile', { uid: comment.commentOwner.uid })}>
                     <PostOwnerIcon source={{ uri: comment.commentOwner.profileImage }} />
                     <Text fontWeight='semi-bold'>{comment.commentOwner.name}</Text>
@@ -94,7 +95,13 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-
+  showCommentOptions: (commentId, showOptions) => dispatch({
+    type: 'SHOW_COMMENT_OPTIONS',
+    payload: {
+      commentId,
+      showOptions
+    }
+  })
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostDetails);
@@ -166,7 +173,7 @@ const Comments = styled.View`
   box-shadow: 0 4px 12px rgba(0,0,0, 0.05);
 `;
 
-const Comment = styled.View`
+const Comment = styled.TouchableOpacity`
   background: #fff;
   border-radius: 16px;
   margin-top: 10px;

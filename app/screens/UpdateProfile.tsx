@@ -94,7 +94,7 @@ const UpdateProfile = ({ navigation }) => {
           </ProfileImageContent>
         </UpdateProfileImageContainer>
 
-        <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Location' onChangeText={(text) => setLocation(text)} placeholder='Fort Lauderdale, FL' />
+        {/* <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Location' onChangeText={(text) => setLocation(text)} placeholder='Fort Lauderdale, FL' /> */}
         <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Email' onChangeText={(text) => setEmail(text)} placeholder={fireAuth.currentUser.email} />
         <ButtonGroup>
           <Button expand='none' fontSize={14} fill='danger' height={40} marginTop={20} width={170} onPress={() => navigation.pop()}>Cancel</Button>

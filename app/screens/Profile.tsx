@@ -19,6 +19,7 @@ import { deletePost, likePost, updatePost } from '../redux/actions/createPostAct
 
 const Profile = ({
   dogs,
+  deletePost,
   navigation, 
   getUserPosts, 
   isLoading,
@@ -68,7 +69,7 @@ const Profile = ({
   return (
     <>
     { addDogFormVisible && <AddDogForm dogCreated={() => setAddDogFormVisible(!addDogFormVisible)} onPress={() => setAddDogFormVisible(!addDogFormVisible)} /> }
-    { postFormVisible && <CreatePostForm onPress={() => setPostFormVisible(!postFormVisible)} /> }
+    { postFormVisible && <CreatePostForm visible={() => setPostFormVisible(!postFormVisible)} /> }
       <Container>
         <AppHeader height={100}>
           <TitleArea onStartShouldSetResponder={() => navigation.pop()}>
@@ -121,7 +122,11 @@ const Profile = ({
                   <Text color='darkText' fontSize={28} fontWeight='semi-bold'>{fireAuth.currentUser.displayName}</Text>
                 }
                 <Location>
-                  <Text color='darkText' fontSize={16} fontWeight='semi-bold'>{userInfo.city}, {userInfo.state} - {userInfo?.zipcode}</Text>
+                  { userInfo?.city == undefined ?
+                    <Text color='darkText' fontSize={16} fontWeight='semi-bold'>No Location Provided</Text>
+                    :
+                    <Text color='darkText' fontSize={16} fontWeight='semi-bold'>{userInfo?.city}, {userInfo?.state} - {userInfo?.zipcode}</Text>
+                  }
                 </Location>
               </UserInfo>
               :
@@ -144,7 +149,7 @@ const Profile = ({
                   fontSize={14} 
                   width={170}  
                   onPress={() => navigation.push('chatroom', { 
-                    message_session_id: null ,
+                    message_session_id: null,
                     city: userInfo.city,
                     firstName: userInfo.firstName,
                     lastName: userInfo.lastName,
@@ -236,6 +241,7 @@ const Profile = ({
                       onPressDelete={() => deletePost(postId)}
                       onUpdatePost={(text) => updatePost({ description: text, postId })}
                       liked={liked}
+                      uid={postOwner.uid}
                     />
                   )
                 })
@@ -345,14 +351,15 @@ const SingleButton = styled.View`
 
 const PetsContainer = styled.View`
   padding-top: 12px;
+  height: 180px;
 `;
 
 const PetItem = styled.TouchableOpacity`
   align-items: center;
   box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
   width: 150px;
-  margin-top: 10px;
-  margin-left: 10px;
+  margin-top: 20px;
+  margin-left: 16px;
 `;
 
 const PatImage = styled.Image`

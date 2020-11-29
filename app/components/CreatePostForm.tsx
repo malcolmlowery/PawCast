@@ -9,7 +9,7 @@ import Button from './Button';
 import Text from './Text';
 import { createNewPost } from '../redux/actions/createPostAction';
 
-const CreatePostForm = ({ createPost, onPress }) => {
+const CreatePostForm = ({ createPost, creatingPost, visible }) => {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
 
@@ -18,6 +18,8 @@ const CreatePostForm = ({ createPost, onPress }) => {
     let result: any = await ImagePicker.launchImageLibraryAsync({
       base64: true,
       quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
     });
     
     if(permissionResult.granted === false) {
@@ -36,7 +38,7 @@ const CreatePostForm = ({ createPost, onPress }) => {
 
   const onSubmit = async () => {
     const userInput = { description, image };
-    createPost(userInput)
+    createPost(userInput).then(() => visible(false))
   }
 
   return (
@@ -64,27 +66,34 @@ const CreatePostForm = ({ createPost, onPress }) => {
               </ImageSection>
             </Content>
 
-            <ButtonGroup>
-              <Button
-                color='white' 
-                fill='danger' 
-                expand='none'
-                height={34}
-                onPress={() => onPress()}
-                width={145}>
-                  Cancel
-              </Button>
-              <Button 
-                color='white' 
-                fill='primary' 
-                expand='none'
-                height={34}
-                marginBottom={10}
-                onPress={() => onSubmit()}
-                width={145}>
-                  Post
-              </Button>
-            </ButtonGroup>
+            { creatingPost == true ?
+                <Wait>
+                  <Text>Creating post...</Text>
+                </Wait>
+              :
+                <ButtonGroup>
+                  <Button
+                    color='white' 
+                    fill='danger' 
+                    expand='none'
+                    height={34}
+                    onPress={visible}
+                    width={145}>
+                      Cancel
+                  </Button>
+                  <Button 
+                    color='white' 
+                    fill='primary' 
+                    expand='none'
+                    height={34}
+                    marginBottom={10}
+                    onPress={() => onSubmit()}
+                    width={145}>
+                      Post
+                  </Button>
+                </ButtonGroup>
+            }
+            
           </Card>
         </KeyboardAvoidingView>
       </Container>
@@ -92,11 +101,15 @@ const CreatePostForm = ({ createPost, onPress }) => {
   )
 };
 
+const mapStateToProps = (state) => ({
+  creatingPost: state.posts.creatingPost
+})
+
 const mapDispatchToProps = (dispatch) => ({
   createPost: (userInput) => dispatch(createNewPost(userInput)),
 })
 
-export default connect(null, mapDispatchToProps)(CreatePostForm);
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePostForm);
 
 const Backdrop = styled.View`
   background: #000;
@@ -167,3 +180,9 @@ const ImagePreview = styled.Image`
   height: 100px;
   width: 100px;
 `
+
+const Wait = styled.View`
+  align-items: center;
+  height: 40px;
+  justify-content: center
+`;

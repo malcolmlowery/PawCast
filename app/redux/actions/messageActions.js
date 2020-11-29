@@ -122,7 +122,7 @@ export const sendNewMessage = (userData) => {
       text,
       userId,
     } = userData;
-console.log('sahsuafsajfba')
+    
     const currentUserUID = fireAuth.currentUser.uid;
     const messagesCollection = fireStore.collection('messages');
     const usersCollection = fireStore.collection('users');

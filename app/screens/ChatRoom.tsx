@@ -21,6 +21,18 @@ const Messages = ({
   const [messages, setMessages]: any = useState();
 
   useEffect(() => {
+
+    // fireStore
+    //   .collection(`messages/${message_session_id}/chats`).orderBy('createdAt', 'asc')
+    //   .get()
+    //   .then(snapshot => {
+    //     snapshot.forEach(doc => {
+    //       const data = [];
+    //       data.push(doc.data())
+    //       return setMessages(doc.data())
+    //     })
+    //   })
+
     fireStore
       .collection(`messages/${message_session_id}/chats`).orderBy('createdAt', 'asc')
       .onSnapshot(query => {

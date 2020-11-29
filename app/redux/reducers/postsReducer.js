@@ -3,7 +3,9 @@ import {
   GET_POST_REQUEST,
   GET_POST_SUCCESS,
   GET_POST_FAILURE,
+  CREATE_POST_REQUEST,
   CREATE_POST_SUCCESS,
+  CREATE_POST_FAILURE,
   DELETE_POST_SUCCESS,
   UPDATE_POST_SUCCESS,
   ADD_COMMENT_SUCCESS,
@@ -13,6 +15,7 @@ import {
 const intialState = {
   errors: null,
   isLoading: false,
+  creatingPost: null,
   data: []
 }
 
@@ -23,7 +26,6 @@ export const postReducer = (state = intialState, action) => {
       isLoading: true,
     }
     case GET_POST_SUCCESS: {
-      // console.log({
       //   ...state,
       //   data: action.payload
       // })
@@ -37,9 +39,14 @@ export const postReducer = (state = intialState, action) => {
       ...state,
       isLoading: false,
     }
+    case CREATE_POST_REQUEST: return {
+      ...state,
+      creatingPost: true
+    }
     case CREATE_POST_SUCCESS: {
       return {
         ...state,
+        creatingPost: false,
         data: [{
           ...action.payload,
           comments: [],
@@ -49,7 +56,11 @@ export const postReducer = (state = intialState, action) => {
         }].concat(state.data)
       }
     }
-
+    case CREATE_POST_FAILURE: return {
+      ...state,
+      creatingPost: true,
+      error: action.payload
+    }
     case 'SHOW_OPTIONS_MODE': return {
       ...state,
       data: state.data.map(post => {
@@ -127,7 +138,6 @@ export const postReducer = (state = intialState, action) => {
       })
     }
     case ADD_COMMENT_SUCCESS: {
-      console.log(action.payload)
       return {
         ...state,
         data: state.data.map(post => {
@@ -151,7 +161,7 @@ export const postReducer = (state = intialState, action) => {
           return {
             ...post,
             likes: post.likes + 1,
-            likedByCurrentUser: post.likesByUsers.find(userId => userId !== fireAuth.currentUser.uid)
+            likedByCurrentUser: post.likesByUsers.concat(fireAuth.currentUser.uid)
           }
         }
         if(liked == 'UNLIKED' && postId == post.postId) {
@@ -163,6 +173,10 @@ export const postReducer = (state = intialState, action) => {
         }
         return post
       })
+    }
+    case 'SHOW_COMMENT_OPTIONS': return {
+      ...state,
+
     }
     default: return state
   }

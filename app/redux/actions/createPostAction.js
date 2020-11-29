@@ -39,13 +39,15 @@ export const createNewPost = (userInput) => {
   return async (dispatch) => {
     try {
       dispatch(createPostRequest())
-      const imageBlob = await fetch(image).then(response => response.blob());
       const uid = await fireAuth.currentUser.uid
       const postId = await fireStore.collection('posts').doc().id;
       const timestamp = firebase.firestore.Timestamp.now();
       const userInfo = fireAuth.currentUser;
+      
+      if(image !== null) {
+        const imageBlob = await fetch(image).then(response => response.blob());
 
-      const urlOfImage = await fireStorage
+        const urlOfImage = await fireStorage
         .ref()
         .child(`image-${uuid()}.jpg`)
         .put(imageBlob)
@@ -54,39 +56,79 @@ export const createNewPost = (userInput) => {
         })
         .catch(error => console.log(error))
 
-      await fireStore
-        .collection('posts')
-        .doc(postId)
-        .set({
-          description,
-          createdAt: timestamp,
-          imageUrl: urlOfImage,
-          postId,
-          likes: 0,
-          likesByUsers: [],
-          postOwner: {
-            uid,
-            name: userInfo.displayName,
-            profileImage: userInfo.photoURL,
-          },
-        })
-        .then(() => {
-          dispatch(createPostSuccess({
+        return await fireStore
+          .collection('posts')
+          .doc(postId)
+          .set({
             description,
-            createdAt: timestamp.toDate().toString(),
+            createdAt: timestamp,
             imageUrl: urlOfImage,
-            likesByUsers: [],
-            likedByCurrentUser: null,
             postId,
             likes: 0,
+            likesByUsers: [],
             postOwner: {
               uid,
               name: userInfo.displayName,
               profileImage: userInfo.photoURL,
             },
-          }))
-        })
-        .catch(error => console.log(error))
+          })
+          .then(() => {
+            dispatch(createPostSuccess({
+              description,
+              createdAt: timestamp.toDate().toString(),
+              imageUrl: urlOfImage,
+              likesByUsers: [],
+              likedByCurrentUser: null,
+              postId,
+              likes: 0,
+              postOwner: {
+                uid,
+                name: userInfo.displayName,
+                profileImage: userInfo.photoURL,
+              },
+            }))
+          })
+          .catch(error => console.log(error))
+      }
+
+
+      await fireStore
+          .collection('posts')
+          .doc(postId)
+          .set({
+            description,
+            createdAt: timestamp,
+            imageUrl: '',
+            postId,
+            likes: 0,
+            likesByUsers: [],
+            postOwner: {
+              uid,
+              name: userInfo.displayName,
+              profileImage: userInfo.photoURL,
+            },
+          })
+          .then(() => {
+            dispatch(createPostSuccess({
+              description,
+              createdAt: timestamp.toDate().toString(),
+              imageUrl: '',
+              likesByUsers: [],
+              likedByCurrentUser: null,
+              postId,
+              likes: 0,
+              postOwner: {
+                uid,
+                name: userInfo.displayName,
+                profileImage: userInfo.photoURL,
+              },
+            }))
+          })
+          .catch(error => console.log(error))
+
+
+
+  
     }
     catch(error) {
       dispatch(createPostFailure(error))

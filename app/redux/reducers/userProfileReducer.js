@@ -7,6 +7,9 @@ import {
   CREATE_DOG_SUCCESS,
   DELETE_DOG_SUCCESS,
   LIKE_POST_SUCCESS,
+  UPDATE_POST_SUCCESS,
+  ADD_COMMENT_SUCCESS,
+  DELETE_POST_SUCCESS,
 } from '../actions/Types';
 
 const intialState = {
@@ -17,6 +20,10 @@ const intialState = {
 
 export const userProfileReducer = (state = intialState, action) => {
   switch(action.type) {
+    case DELETE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.filter(post => post.postId !== action.payload)
+    }
     case 'GET_USER_REQUEST': return {
       ...state,
       isLoading: true,
@@ -47,7 +54,36 @@ export const userProfileReducer = (state = intialState, action) => {
         }].concat(state.data)
       }
     }
-
+case UPDATE_POST_SUCCESS: return {
+      ...state,
+      data: state.data.map(post => {
+        if(post.postId === action.payload.postId) {
+          return {
+            ...post,
+            description: action.payload.description,
+            editPost: false,
+            showOptions: false,
+          }
+        }
+        return post
+      })
+    }
+    case ADD_COMMENT_SUCCESS: {
+      console.log(action.payload)
+      return {
+        ...state,
+        data: state.data.map(post => {
+          if(post.postId === action.payload.postId) {
+            return {
+              ...post,
+              comments: [action.payload].concat(post.comments),
+              commentMode: false,
+            }
+          }
+          return post
+        })
+      }
+    }
     case 'SHOW_OPTIONS_MODE': return {
       ...state,
       data: state.data.map(post => {
@@ -81,6 +117,25 @@ export const userProfileReducer = (state = intialState, action) => {
             ...post,
             commentMode: false,
             editPost: true,
+          }
+        }
+        return post
+      })
+    }
+    case 'SHOW_OPTIONS_MODE': return {
+      ...state,
+      data: state.data.map(post => {
+        if(post.postId === action.payload.postId && action.payload.showOptions == true) {
+          return {
+            ...post,
+            editPost: false,
+            showOptions: false,
+          }
+        }
+        if(post.postId === action.payload.postId && action.payload.showOptions == false) {
+          return {
+            ...post,
+            showOptions: true
           }
         }
         return post
@@ -124,7 +179,7 @@ export const userProfileReducer = (state = intialState, action) => {
           return {
             ...post,
             likes: post.likes + 1,
-            likedByCurrentUser: post.likesByUsers.find(userId => userId !== fireAuth.currentUser.uid)
+            likedByCurrentUser: post.likesByUsers.concat(fireAuth.currentUser.uid)
           }
         }
         if(liked == 'UNLIKED' && postId == post.postId) {
