@@ -224,7 +224,7 @@ export const likePost = (postId) => {
             .doc(postId)
             .update({
               likes: firebase.firestore.FieldValue.increment(-1),
-              likesByUsers: data.filter(user => user !== userId)
+              likesByUsers: firebase.firestore.FieldValue.arrayRemove(fireAuth.currentUser.uid)
             })
             .then(() => dispatch(likePostSuccess({
               liked: 'UNLIKED', 
@@ -240,7 +240,10 @@ export const likePost = (postId) => {
               likes: firebase.firestore.FieldValue.increment(1),
               likesByUsers: data.concat(userId)
             })
-            .then(() => dispatch(likePostSuccess({liked: 'LIKED', postId, likedByCurrentUser: Boolean(data.find(userLike => userLike !== currentUserId))})))
+            .then(() => dispatch(likePostSuccess({
+              liked: 'LIKED', postId, 
+              likedByCurrentUser: firebase.firestore.FieldValue.arrayUnion(fireAuth.currentUser.uid)
+            })))
         }
       })
 

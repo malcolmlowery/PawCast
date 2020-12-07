@@ -7,7 +7,6 @@ import AppHeader from '../components/AppHeader';
 import Button from '../components/Button';
 import { colors } from '../utils/theme';
 import Text from '../components/Text';
-import TextInput from '../components/TextInput';
 import { Alert, Keyboard } from 'react-native';
 import uuid from 'react-uuid'
 
@@ -64,9 +63,9 @@ const UpdateProfile = ({ navigation }) => {
       photoURL: urlOfImage
     })
     
-    if (email == null || '') {
-      fireAuth.currentUser.updateEmail(email).then(() => fireAuth.signOut())
-    }
+    
+    await fireAuth.currentUser.updateEmail(email).then(() => fireAuth.signOut())
+    
   }
 
   return (
@@ -95,7 +94,7 @@ const UpdateProfile = ({ navigation }) => {
         </UpdateProfileImageContainer>
 
         {/* <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Location' onChangeText={(text) => setLocation(text)} placeholder='Fort Lauderdale, FL' /> */}
-        <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Email' onChangeText={(text) => setEmail(text)} placeholder={fireAuth.currentUser.email} />
+        {/* <TextInput styles={{ backgroundColor: '#e8e8e8' }} label='Email' onChangeText={(text) => setEmail(text)} placeholder={fireAuth.currentUser.email} /> */}
         <ButtonGroup>
           <Button expand='none' fontSize={14} fill='danger' height={40} marginTop={20} width={170} onPress={() => navigation.pop()}>Cancel</Button>
           <Button expand='none' fontSize={14} height={40} marginTop={20} width={170} onPress={() => onSubmit()}>Update Profile</Button>

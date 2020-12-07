@@ -45,11 +45,21 @@ const PostDetails = ({ navigation, route }) =>  {
           <Likes>
             <Text fontWeight='semi-bold'>{likes} likes</Text>
           </Likes>
-          <BannerImage source={{ uri: imageUrl }} />
 
-          <Description>
-            <Text>{description}</Text>
-          </Description>
+          { imageUrl !== '' ?
+            <>
+              <BannerImage source={{ uri: imageUrl }} />
+              <Description>
+                <Text>{description}</Text>
+              </Description>
+            </>
+            :
+            <T>
+              <Description>
+                <Text>{description}</Text>
+              </Description>
+            </T>
+          }
 
           {/* <ActionButtons>
             <Button color='primary' fill='none' fontWeight='bold'>Like</Button>
@@ -188,4 +198,8 @@ const CommentOwner = styled.TouchableOpacity`
 const CommentDesc = styled.View`
   margin: 0 10px;
   padding-bottom: 12px;
+`;
+
+const T = styled.View`
+  margin-top: 40px;
 `;

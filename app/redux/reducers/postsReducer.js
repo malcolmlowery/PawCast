@@ -12,11 +12,16 @@ import {
   LIKE_POST_SUCCESS,
 } from '../actions/Types';
 
+const HIDE_POST_REQUEST = 'HIDE_POST_REQUEST';
+const HIDE_POST_SUCCESS = 'HIDE_POST_SUCCESS';
+const HIDE_POST_FAILURE = 'HIDE_POST_FAILURE';
+
 const intialState = {
   errors: null,
   isLoading: false,
   creatingPost: null,
-  data: []
+  data: [],
+  hidden_posts: [],
 }
 
 export const postReducer = (state = intialState, action) => {
@@ -26,13 +31,20 @@ export const postReducer = (state = intialState, action) => {
       isLoading: true,
     }
     case GET_POST_SUCCESS: {
-      //   ...state,
-      //   data: action.payload
-      // })
+      const { hidden_post_ids, postWithComments } = action.payload;
+      
+      
+        const posts = postWithComments.filter(post => {
+          if(hidden_post_ids != undefined) {
+            return !hidden_post_ids.includes(post.postId)
+          }
+          return post
+        })
+
       return {
         ...state,
         isLoading: false,
-        data: action.payload
+        data: posts
       }
     }
     case GET_POST_FAILURE: return {
@@ -177,6 +189,26 @@ export const postReducer = (state = intialState, action) => {
     case 'SHOW_COMMENT_OPTIONS': return {
       ...state,
 
+    }
+    case HIDE_POST_REQUEST: return {
+      ...state
+    }
+    case HIDE_POST_SUCCESS: {
+      console.log(action.payload)
+      return {
+        ...state,
+        data: state.data.filter(post => {
+          if(post.postId === action.payload) {
+            return 
+          }
+
+          return post
+        })
+      }
+    }
+    case HIDE_POST_FAILURE: return {
+      ...state,
+      errors: action.payload
     }
     default: return state
   }

@@ -73,7 +73,7 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
 
         <Content>
           <DogInfoGroup>
-            <InfoItem style={{ backgroundColor: '#a66f51' }}>
+            <InfoItem style={{ backgroundColor: '#303f9f' }}>
               <Text color='white' fontWeight='semi-bold'>Breed Line:</Text>
               <Text color='white' fontWeight='semi-bold'>{breedLine}</Text>
             </InfoItem>
@@ -81,7 +81,7 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
               <Text color='white' fontWeight='semi-bold'>Breed:</Text>
               <Text color='white' fontWeight='semi-bold'>{breed}</Text>
             </InfoItem>
-            <InfoItem style={{ backgroundColor: '#a66f51' }}>
+            <InfoItem style={{ backgroundColor: '#303f9f' }}>
               <Text color='white' fontWeight='semi-bold'>Age:</Text>
               <Text color='white' fontWeight='semi-bold'>{age}</Text>
             </InfoItem>
@@ -89,7 +89,7 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
               <Text color='white' fontWeight='semi-bold'>Gender:</Text>
               <Text color='white' fontWeight='semi-bold'>{gender}</Text>
             </InfoItem>
-            <InfoItem style={{ backgroundColor: '#a66f51' }}>
+            <InfoItem style={{ backgroundColor: '#303f9f' }}>
               <Text color='white' fontWeight='semi-bold'>Color:</Text>
               <Text color='white' fontWeight='semi-bold'>{color}</Text>
             </InfoItem>
@@ -97,7 +97,7 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
               <Text color='white' fontWeight='semi-bold'>Ear Crop:</Text>
               <Text color='white' fontWeight='semi-bold'>{earCrop}</Text>
             </InfoItem>
-            <InfoItem style={{ backgroundColor: '#a66f51' }}>
+            <InfoItem style={{ backgroundColor: '#303f9f' }}>
               <Text color='white' fontWeight='semi-bold'>Tail Crop:</Text>
               <Text color='white' fontWeight='semi-bold'>{tailCrop}</Text>
             </InfoItem>

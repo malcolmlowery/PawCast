@@ -7,6 +7,7 @@ import Text from './Text';
 import Button from './Button';
 import { Alert } from 'react-native';
 import { fireAuth } from '../firebase/firebase';
+import { reportUser } from '../redux/actions/userReportingActions';
 
 interface CardI {
   addCommentToPost: (a) => void
@@ -35,6 +36,8 @@ interface CardI {
   liked: any
   navFromComment: () => void
   uid: string
+  handleHidePostOptions: () => void
+  reportUser: () => void
 }
 
 const Card: React.FC<CardI> = ({
@@ -60,6 +63,8 @@ const Card: React.FC<CardI> = ({
   liked,
   navFromComment,
   uid,
+  hidePostButton,
+  reportUser,
 }) => {
 
   const [commentText, setCommentText] = useState('');
@@ -77,6 +82,41 @@ const Card: React.FC<CardI> = ({
         {
           text: 'DELETE',
           onPress: () => onPressDelete(),
+          style: 'destructive',
+        }
+      ]
+    )
+  }
+
+  const handleHidePostOptions = () => {
+    Alert.alert(
+      'Hide this post',
+      'Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'HIDE POST',
+          onPress: () => {
+            hidePostButton()
+            Alert.alert(
+              'Report',
+              'Do you want to report this user to admin?',
+              [
+                {
+                  text: 'No',
+                  style: 'cancel',
+                },
+                {
+                  text: 'YES',
+                  onPress: () => reportUser(),
+                  style: 'destructive',
+                }
+              ]
+            )
+          },
           style: 'destructive',
         }
       ]
@@ -115,12 +155,19 @@ const Card: React.FC<CardI> = ({
               </Button>
             </OptionsButtonGroup>
           }
-          { fireAuth.currentUser.uid === uid &&
+          { fireAuth.currentUser.uid === uid ?
             <Ionicons 
               color={colors.primary} 
               name='ios-options' 
               size={24} 
               onPress={() => handleShowOptions()} 
+            />  
+            :
+            <Ionicons 
+              color={colors.primary} 
+              name='ios-alert' 
+              size={24} 
+              onPress={() => handleHidePostOptions()} 
             />  
           }
         </GroupItem>

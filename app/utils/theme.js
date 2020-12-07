@@ -9,7 +9,7 @@
 // }
 
 export const colors = {
-  primary: '#9a674c',
+  primary: '#3949ab',
   secondary: '#b61de2',
   alert: '#dc235a',
   danger: '#2d2b2c',

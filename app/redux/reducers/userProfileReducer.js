@@ -15,7 +15,9 @@ import {
 const intialState = {
   errors: null,
   isLoading: true,
-  data: []
+  data: [],
+  dogs: [],
+  dogsLoading: false,
 }
 
 export const userProfileReducer = (state = intialState, action) => {
@@ -26,6 +28,8 @@ export const userProfileReducer = (state = intialState, action) => {
     }
     case 'GET_USER_REQUEST': return {
       ...state,
+      dogs: [],
+      data: [],
       isLoading: true,
     }
     case 'GET_USER_SUCCESS': {

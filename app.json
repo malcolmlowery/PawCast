@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Pawcast-App",
+    "name": "Pawcast",
     "slug": "Pawcast-App",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3949ab"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,7 +17,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera access is necessary to use this app properly. That way you can post your own content to further enhance your profile!"
+      },
+      "supportsTablet": true,
+      "bundleIdentifier": "net.d3technologies.pawcast",
+      "buildNumber": "1.0.1"
     },
     "android": {
       "adaptiveIcon": {

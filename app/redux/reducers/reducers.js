@@ -7,6 +7,7 @@ import { messagesReducer } from './messagesReducer';
 import { postReducer } from './postsReducer';
 import { userLocationsReducer } from './userLocationsReducer';
 import { userProfileReducer } from './userProfileReducer';
+import { userReportingData } from './userReportingReducer';
 
 export const reducers = combineReducers({
   user: loginUserReducer,
@@ -17,4 +18,5 @@ export const reducers = combineReducers({
   chatroom: chatroomReducer,
   message_session: messageSessionReducer,
   dobermannCounter: dobermannCounterReducer,
+  reportedUserData: userReportingData,
 })

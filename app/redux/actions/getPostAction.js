@@ -26,13 +26,21 @@ export const fetchPosts = () => {
     try {
       dispatch(getPostRequest())
 
+      const hidden_post_ids = await fireStore
+        .collection('hidden_posts')
+        .doc(fireAuth.currentUser.uid)
+        .get()
+        .then(snapshot => {
+          return snapshot.data()?.hidden_posts
+        })
+
       const postsData = await fireStore
         .collection('posts')
         .orderBy('createdAt', 'desc')
         .get()
         .then(snapshot => {
           const posts = [];
-          snapshot.forEach(doc => posts.push(doc.data()))
+          snapshot.forEach(doc => posts.push(doc.data()));
           return posts
         })
 
@@ -45,9 +53,8 @@ export const fetchPosts = () => {
           return comments
         })
 
-      const posts = postsData.map(post => post)
-      
-      const postWithComments = posts.map(post => {
+      const postWithComments = postsData.map(post => {
+
         const comments = []
         const comment = commentsData.map(comment => {
           if(post.postId === comment.postId) {
@@ -56,8 +63,7 @@ export const fetchPosts = () => {
           return {}
         })
 
-        const currentUserId = fireAuth.currentUser.uid;
-        if(posts.postId === comments.postId && fireAuth.currentUser.uid === post.postOwner.uid) {
+        if(postsData.postId === comments.postId && fireAuth.currentUser.uid === post.postOwner.uid) {
           return {
             ...post,
             comments,
@@ -74,8 +80,11 @@ export const fetchPosts = () => {
         }
         
       })
-
-      dispatch(getPostSuccess(postWithComments))
+      
+      dispatch(getPostSuccess({
+        postWithComments,
+        hidden_post_ids,
+      }))
   
     }
     catch(error) {
@@ -96,7 +105,7 @@ export const addCommentFailure = () => ({
 });
 
 export const addCommentToPost = (commentData) => {
-  console.log(commentData)
+  // console.log(commentData)
   return async (dispatch) => {
     const commentId = fireStore.collection('comments').doc().id;
     const { displayName, photoURL, uid } = fireAuth.currentUser;
@@ -135,3 +144,4 @@ export const addCommentToPost = (commentData) => {
     }
   }
 }
+

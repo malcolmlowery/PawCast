@@ -1,4 +1,4 @@
-import { fireAuth, fireStorage, fireStore } from '../../firebase/firebase';
+import { fireAuth, fireStorage, fireStore, firebase } from '../../firebase/firebase';
 import { 
   loginUserRequest,
   loginUserSuccess,
@@ -29,6 +29,7 @@ export const createUser = (userInput) => {
     email,
     password,
     zipcode,
+    userAgree,
   } = userInput
 
   return async (dispatch) => {
@@ -43,6 +44,7 @@ export const createUser = (userInput) => {
         })
         .catch(error => console.log(error));
 
+      const timestamp = firebase.firestore.Timestamp.now();
       const {
         lat,
         lng,
@@ -67,18 +69,29 @@ export const createUser = (userInput) => {
           .catch(error => console.log(error))
 
           await fireStore
+            .collection('terms_agreement')
+            .doc(user.uid)
+            .set({
+              agreedAt: timestamp,
+              uid: user.uid,
+              name: `${firstName} ${lastName}`
+            })
+            .catch(error => console.log(error))
+
+          await fireStore
             .collection('users')
             .doc(user.uid)
             .set({
               userId: user.uid,
               firstName,
               lastName,
-              email,
+              email: email.toLowerCase(),
               zipcode,
               profileImage: imageUrl,
               city,
               state,
             })
+            .catch(error => console.log(error))
 
           await fireStore
             .collection('user_locations')
@@ -94,6 +107,7 @@ export const createUser = (userInput) => {
               uid: user.uid,
               profileImage: imageUrl,
             })
+            .catch(error => console.log(error))
 
           dispatch(createUserSuccess())
           dispatch(loginUserRequest())

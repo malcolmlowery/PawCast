@@ -6,11 +6,13 @@ import {
   LOGOUT_USER_SUCCESS,
   LOGOUT_USER_REQUEST,
   LOGOUT_USER_FAILURE,
+  VERIFY_SESSION_REQUEST,
   VERIFY_SESSION_SUCCESS,
   VERIFY_SESSION_EXPIRED,
 } from '../actions/Types';
 
 const intialState = {
+  bannedMessage: '',
   authenticating: null,
   isAuthenticated: null,
   errors: null,
@@ -18,9 +20,20 @@ const intialState = {
 
 export const loginUserReducer = (state = intialState, action) => {
   switch(action.type) {
-    case LOGIN_USER_REQUEST: return {
+    case LOGIN_USER_REQUEST:
+      return {
       ...state,
-      authenticating: true,
+      bannedMessage: '',
+    }
+    case 'LOGIN_USER_BANNED': return {
+      ...state,
+      authenticating: false,
+      isAuthenticated: false,
+      bannedMessage: action.payload.message
+    }
+    case VERIFY_SESSION_REQUEST: return {
+      ...state,
+      authenticating: true
     }
     case LOGIN_USER_SUCCESS: 
     case VERIFY_SESSION_SUCCESS: {
@@ -34,22 +47,27 @@ export const loginUserReducer = (state = intialState, action) => {
       ...state,
       authenticating: false,
       isAuthenticated: false,
-      errors: true,
+      bannedMessage: '',
+      errors: action.payload,
     }
     case LOGOUT_USER_REQUEST: return {
       ...state,
-      authenticating: true,
+      authenticating: false,
     }
     case LOGOUT_USER_SUCCESS: return {
       ...state,
       authenticating: false,
       isAuthenticated: false,
+      bannedMessage: '',
+      errors: null,
     }
-    case LOGOUT_USER_FAILURE || VERIFY_SESSION_EXPIRED: return {
+    case LOGOUT_USER_FAILURE:
+    case VERIFY_SESSION_EXPIRED: return {
       ...state,
       user: {},
       authenticating: false,
-      errors: true,
+      isAuthenticated: false,
+      errors: action.payload,
     }
     default: return state
   }

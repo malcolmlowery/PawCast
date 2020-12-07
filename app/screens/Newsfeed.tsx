@@ -12,6 +12,7 @@ import { fireAuth } from '../firebase/firebase';
 import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
 import { getAllDobermannsByCount } from '../redux/actions/dobermanCountActions';
 import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
+import { hidePost, reportUser } from '../redux/actions/userReportingActions';
 import { colors } from '../utils/theme';
 
 const Newsfeed: React.FC<any> = ({ 
@@ -27,12 +28,16 @@ const Newsfeed: React.FC<any> = ({
   setCommentMode, 
   setEditPost,
   updatePost,
+  hidePost,
+  reportUser,
 }) => {
 
   useEffect(() => {
     getPosts()
     // getAllDobermanns()
   }, [])
+
+  console.log(posts)
 
   const [postFormVisible, setPostFormVisible] = useState(false);
 
@@ -50,7 +55,7 @@ const Newsfeed: React.FC<any> = ({
         <AppHeader>
           <Text color='primary' fontSize={28} fontWeight='semi-bold'>Newsfeed</Text>
           <ButtonArea>
-            <Button color='white' expand='none' height={35}  width={100} fontSize={14} fill='danger' right={16} onPress={() => setPostFormVisible(!postFormVisible)}>
+            <Button color='white' expand='none' height={35}  width={100} fontSize={14} fill='primary' right={16} onPress={() => setPostFormVisible(!postFormVisible)}>
               New Post
             </Button>
             <ProfileButton onPress={() => navigation.navigate('profile', { uid: fireAuth.currentUser.uid })}>
@@ -124,6 +129,15 @@ const Newsfeed: React.FC<any> = ({
                     post: post
                   })}
                   uid={postOwner.uid}
+                  hidePostButton={() => hidePost(postId)}
+                  reportUser={() => reportUser({
+                    uid: postOwner.uid,
+                    postId: postId,
+                    name: postOwner.name,
+                    profileImage: postOwner.profileImage,
+                    imageUrl,
+                    description,
+                  })}
                 />
               )
             })
@@ -163,7 +177,9 @@ const mapDispatchToProps = (dispatch) => ({
     payload: createPostMode,
   }),
   updatePost: (userInput) => dispatch(updatePost(userInput)),
-  getAllDobermanns: () => dispatch(getAllDobermannsByCount())
+  getAllDobermanns: () => dispatch(getAllDobermannsByCount()),
+  hidePost: (postId) => dispatch(hidePost(postId)),
+  reportUser: (userId) => dispatch(reportUser(userId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);

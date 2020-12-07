@@ -1,4 +1,4 @@
-import { fireAuth } from '../../firebase/firebase';
+import { fireAuth, fireStore } from '../../firebase/firebase';
 import {
   VERIFY_SESSION_REQUEST,
   VERIFY_SESSION_SUCCESS,
@@ -22,13 +22,28 @@ export const verifyUserSession = () => {
     try {
       dispatch(verifySessionRequest())
       
-      fireAuth.onAuthStateChanged(user => {
-        if(user !== null) {
-          dispatch(verifySessionSuccess(user))
-        } else {
-          dispatch(verifySessionExpired())
-        }
-      })
+      
+      // const isBanned = await fireStore
+      // .collection('banned_users')
+      // .doc(fireAuth.currentUser.uid)
+      // .get()
+      // .then(snapshot => snapshot.data())
+      // console.log(isBanned?.uid)
+
+      // console.log(fireAuth.currentUser.uid)
+
+      // if(fireAuth.currentUser.uid == null || isBanned?.uid === fireAuth.currentUser.uid) {
+      //   fireAuth.signOut()
+      //   return verifySessionExpired()
+      // }
+      
+        fireAuth.onAuthStateChanged(user => {
+          if(user !== null) {
+            dispatch(verifySessionSuccess(user))
+          } else {
+            dispatch(verifySessionExpired())
+          }
+        })
     }
     catch(error) {
       return console.log(error)

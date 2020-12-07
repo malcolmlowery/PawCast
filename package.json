@@ -36,7 +36,10 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "styled-components": "^5.2.1",
-    "expo-av": "~8.6.0"
+    "expo-av": "~8.6.0",
+    "expo-splash-screen": "~0.6.2",
+    "expo-linear-gradient": "~8.3.0",
+    "react-native-webview": "10.7.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

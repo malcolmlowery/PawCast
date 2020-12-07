@@ -88,19 +88,23 @@ const Profile = ({
           />
         </AppHeader>
 
-        <ScrollView style={{ marginBottom: 40 }}>
+        <ScrollView style={{ marginBottom: 24 }}>
           <Content>
             <Banner>
-              <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage  }} />
-              { route.params.uid === fireAuth.currentUser.uid &&
-                <BannerButton onPress={() => openImagePicker()}>
-                  <Ionicons 
-                    color={colors.primary} 
-                    name='ios-camera'
-                    size={34} 
-                    onPress={() => {}}
-                  />
-                </BannerButton>
+              { !isLoading && 
+                <>
+                <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage  }} />
+                { route.params.uid === fireAuth.currentUser.uid &&
+                  <BannerButton onPress={() => openImagePicker()}>
+                    <Ionicons 
+                      color={colors.primary} 
+                      name='ios-camera'
+                      size={34} 
+                      onPress={() => {}}
+                    />
+                  </BannerButton>
+                }
+                </>
               }
             </Banner>
             
@@ -164,29 +168,29 @@ const Profile = ({
               </SingleButton>
             }
 
-            <PetsContainer>
-              <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
-              <ScrollView horizontal={true} style={{ height: 130 }} showsHorizontalScrollIndicator={false}>
-                { dogs ?
-                  dogs.map((dog, index) => {
-                    return (
-                      <PetItem key={index} onPress={() => navigation.push('petDetails', {
-                        dog
-                      })}>
-                        <PatImage source={{ uri: dog.images[0] }} />
-                        <Text top={6}>{dog.name}</Text>
-                      </PetItem>
-                    )
-                  })
-                  :
-                  <PetItem>
-                    <PatImage style={{ backgroundColor: colors.danger }} />
-                    <Text top={6}>No pets listed</Text>
-                  </PetItem>
-                }
-              </ScrollView>
-            </PetsContainer>
-
+              <PetsContainer>
+                <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
+                <ScrollView horizontal={true} style={{ height: 130 }} showsHorizontalScrollIndicator={false}>
+                  { dogs ?
+                    dogs.map((dog, index) => {
+                      return (
+                        <PetItem key={index} onPress={() => navigation.push('petDetails', {
+                          dog
+                        })}>
+                          <PatImage source={{ uri: dog.images[0] }} />
+                          <Text top={6}>{dog.name}</Text>
+                        </PetItem>
+                      )
+                    })
+                    :
+                    <PetItem>
+                      <PatImage style={{ backgroundColor: colors.danger }} />
+                      <Text top={6}>No pets listed</Text>
+                    </PetItem>
+                  }
+                </ScrollView>
+              </PetsContainer>
+            
             <PostsContainer>
               { posts &&
                 posts.map((post, index) => {
@@ -218,31 +222,37 @@ const Profile = ({
                   }
 
                   return (
-                    <Card 
-                      key={index}
-                      description={description}
-                      username={postOwner.name}
-                      imageUrl={imageUrl}
-                      likes={likes}
-                      onLikePost={() => likePost(postId)}
-                      commentMode={commentMode}
-                      addCommentToPost={(text) => addComment({postId, comment: text})}
-                      editPost={editPost}
-                      showOptions={showOptions}
-                      handleShowOptions={() => setShowOptions(showOptions, postId)}
-                      comments={comments[0]}
-                      setCommentMode={() => setCommentMode(commentMode, postId)}
-                      setEditPost={() => setEditPost(editPost, postId)}
-                      profileImage={postOwner.profileImage}
-                      navigateToPostDetails={() => navigation.push('postDetails', {
-                        post: post
-                      })}
-                      navigateToUserProfile={() => navigation.push('profile', { uid: postOwner.uid })}
-                      onPressDelete={() => deletePost(postId)}
-                      onUpdatePost={(text) => updatePost({ description: text, postId })}
-                      liked={liked}
-                      uid={postOwner.uid}
-                    />
+                    <>
+                      { post && 
+                        <Card 
+                          description={description}
+                          username={postOwner.name}
+                          imageUrl={imageUrl}
+                          likes={likes}
+                          onLikePost={() => likePost(postId)}
+                          commentMode={commentMode}
+                          addCommentToPost={(text) => addComment({postId, comment: text})}
+                          editPost={editPost}
+                          showOptions={showOptions}
+                          handleShowOptions={() => setShowOptions(showOptions, postId)}
+                          comments={comments[0]}
+                          setCommentMode={() => setCommentMode(commentMode, postId)}
+                          setEditPost={() => setEditPost(editPost, postId)}
+                          profileImage={postOwner.profileImage}
+                          navigateToPostDetails={() => navigation.push('postDetails', {
+                            post: post
+                          })}
+                          navigateToUserProfile={() => navigation.push('profile', { uid: postOwner.uid })}
+                          onPressDelete={() => deletePost(postId)}
+                          onUpdatePost={(text) => updatePost({ description: text, postId })}
+                          liked={liked}
+                          uid={postOwner.uid}
+                          navFromComment={() => navigation.push('postDetails', {
+                            post: post
+                          })}
+                        />
+                      }
+                    </>
                   )
                 })
               }

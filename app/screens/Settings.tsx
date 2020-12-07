@@ -47,6 +47,15 @@ const Settings = ({ logout, navigation }) => {
             </CircleButtonIcon>
             <CircleButtonLabel>Update Profile</CircleButtonLabel>
           </CircleButtonItem>
+
+          { fireAuth.currentUser.uid === 'g3HnPctmsnedxvFzAqPvpb64Dks1' &&
+            <CircleButtonItem>
+              <CircleButtonIcon onPress={() => navigation.push('reported')}>
+                <Ionicons name='ios-warning' color='#fff' size={32} />
+              </CircleButtonIcon>
+              <CircleButtonLabel>Reported Users & Posts</CircleButtonLabel>
+            </CircleButtonItem>
+          }
         </ButtonGroup>
       </Content>
     </Container>
@@ -82,11 +91,12 @@ const CircleButtonItem = styled.View`
 
 const CircleButtonLabel = styled.Text`
   margin: 16px 0;
+  text-align: center;
 `;
 
 const CircleButtonIcon = styled.TouchableOpacity`
   align-items: center;
-  background: ${colors.primary};
+  background: #3949ab;
   border-radius: 30px;
   height: 60px;
   justify-content: center;
