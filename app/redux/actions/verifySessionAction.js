@@ -9,8 +9,9 @@ const verifySessionRequest = () => ({
   type: VERIFY_SESSION_REQUEST
 });
 
-const verifySessionSuccess = () => ({
-  type: VERIFY_SESSION_SUCCESS
+const verifySessionSuccess = (data) => ({
+  type: VERIFY_SESSION_SUCCESS,
+  payload: data
 });
 
 const verifySessionExpired = () => ({
@@ -37,9 +38,19 @@ export const verifyUserSession = () => {
       //   return verifySessionExpired()
       // }
       
-        fireAuth.onAuthStateChanged(user => {
+        fireAuth.onAuthStateChanged(async user => {
           if(user !== null) {
-            dispatch(verifySessionSuccess(user))
+
+            const userData = await fireStore
+              .collection('users')
+              .where('userId', '==', user.uid)
+              .get()
+              .then(snapshot => {
+                // console.log(snapshot.docs.map(s => s.data()))
+                return snapshot.docs.map(s => s.data())
+              })
+
+            dispatch(verifySessionSuccess(userData[0]))
           } else {
             dispatch(verifySessionExpired())
           }

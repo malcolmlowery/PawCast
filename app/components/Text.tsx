@@ -4,7 +4,7 @@ import { colors } from '../utils/theme';
 
 interface TextI {
   bottom?: number
-  color?: 'primary' | 'secondary' | 'alert' | 'danger' | 'white' | 'darkText'
+  color?: 'primary' | 'secondary' | 'alert' | 'danger' | 'white' | 'darkText' | 'lightGray'
   children: any
   fontWeight?: 'normal' | 'semi-bold' | 'bold'
   fontSize?: number
@@ -46,6 +46,7 @@ const Text: React.FC<TextI> = ({
       case 'danger': return colors.danger
       case 'white': return colors.white
       case 'darkText': return colors.darkText
+      case 'lightGray': return colors.lightGray
     }
   }
 

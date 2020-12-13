@@ -16,4 +16,5 @@ export const colors = {
   none: 'transparent',
   white: '#fff',
   darkText: '#181818',
+  lightGray: '#9e9e9e',
 }

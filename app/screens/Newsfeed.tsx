@@ -37,8 +37,6 @@ const Newsfeed: React.FC<any> = ({
     // getAllDobermanns()
   }, [])
 
-  console.log(posts)
-
   const [postFormVisible, setPostFormVisible] = useState(false);
 
   return (

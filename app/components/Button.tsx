@@ -15,6 +15,7 @@ interface ButtonI {
   right?: number
   onPress?: () => void
   width?: number
+  marginLeft?: number
 }
 
 const Button: React.FC<ButtonI> = ({
@@ -30,6 +31,7 @@ const Button: React.FC<ButtonI> = ({
   onPress,
   right,
   width,
+  marginLeft,
 }) => {
 
   const fntWeight = () => {
@@ -77,7 +79,8 @@ const Button: React.FC<ButtonI> = ({
         width,
         right,
         height,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginLeft,
       }}
     >
       <Text 

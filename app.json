@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pawcast",
     "slug": "Pawcast-App",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -22,7 +22,7 @@
       },
       "supportsTablet": true,
       "bundleIdentifier": "net.d3technologies.pawcast",
-      "buildNumber": "1.0.1"
+      "buildNumber": "1.0.2"
     },
     "android": {
       "adaptiveIcon": {

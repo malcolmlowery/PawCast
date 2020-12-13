@@ -15,6 +15,7 @@ const intialState = {
   bannedMessage: '',
   authenticating: null,
   isAuthenticated: null,
+  user: [],
   errors: null,
 }
 
@@ -33,7 +34,7 @@ export const loginUserReducer = (state = intialState, action) => {
     }
     case VERIFY_SESSION_REQUEST: return {
       ...state,
-      authenticating: true
+      authenticating: true,
     }
     case LOGIN_USER_SUCCESS: 
     case VERIFY_SESSION_SUCCESS: {
@@ -41,6 +42,14 @@ export const loginUserReducer = (state = intialState, action) => {
         ...state,
         authenticating: false,
         isAuthenticated: true,
+        user: action.payload
+      }
+    }
+    case 'UPGRADE_USER_SUCCESS': return {
+      ...state,
+      user: {
+        ...state.user,
+        premium_user: action.payload
       }
     }
     case LOGIN_USER_FAILURE: return {

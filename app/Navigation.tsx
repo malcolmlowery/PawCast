@@ -17,6 +17,9 @@ import ChatRoom from './screens/ChatRoom';
 import Messages from './screens/Messages';
 import { Image, View } from 'react-native';
 import ReportedUsers from './screens/ReportUsers';
+import PremiumProfile from './screens/premium-screens/PremiumProfile';
+import PremiumSignUp from './screens/premium-screens/Premium_Signup';
+import PremiumServices from './screens/premium-screens/Premium_Services';
 
 const Stack = createStackNavigator();
 
@@ -46,6 +49,7 @@ const Navigation = ({ isAuthenticated, isAuthenticating, verifyUser }) => {
             <>
             <Stack.Navigator>
               <Stack.Screen name='home' component={Home}  options={{ headerShown: false }} />
+              <Stack.Screen name='marketplace' component={Profile} options={{ headerShown: false }} />
               <Stack.Screen name='profile' component={Profile} options={{ headerShown: false }} />
               <Stack.Screen name='updateProfile' component={UpdateProfile} options={{ headerShown: false }} />
               <Stack.Screen name='petDetails' component={PetDetails} options={{ headerShown: false }} />
@@ -54,6 +58,9 @@ const Navigation = ({ isAuthenticated, isAuthenticating, verifyUser }) => {
               <Stack.Screen name='chatroom' component={ChatRoom} options={{ headerShown: false }} />
               <Stack.Screen name='messages' component={Messages} options={{ headerShown: false }} />
               <Stack.Screen name='reported' component={ReportedUsers} options={{ headerShown: false }} />
+              <Stack.Screen name='premium-profile' component={PremiumProfile} options={{ headerShown: false }} />
+              <Stack.Screen name='premium-signup' component={PremiumSignUp} options={{ headerShown: false }} />
+              <Stack.Screen name='premium-services' component={PremiumServices} options={{ headerShown: false }} />
             </Stack.Navigator>
             </>
           }

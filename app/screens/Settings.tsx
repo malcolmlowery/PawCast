@@ -28,20 +28,6 @@ const Settings = ({ logout, navigation }) => {
 
         <ButtonGroup>
           <CircleButtonItem>
-            <CircleButtonIcon onPress={() => navigation.navigate('profile', { uid: fireAuth.currentUser.uid })}>
-              <Ionicons name='md-person' color='#fff' size={32} />
-            </CircleButtonIcon>
-            <CircleButtonLabel>Profile</CircleButtonLabel>
-          </CircleButtonItem>
-
-          <CircleButtonItem>
-            <CircleButtonIcon onPress={() => navigation.push('mapView')}>
-              <Ionicons name='ios-pin' color='#fff' size={32} />
-            </CircleButtonIcon>
-            <CircleButtonLabel>Dog Map</CircleButtonLabel>
-          </CircleButtonItem>
-
-          <CircleButtonItem>
             <CircleButtonIcon onPress={() => navigation.push('updateProfile')}>
               <Ionicons name='ios-construct' color='#fff' size={32} />
             </CircleButtonIcon>
