@@ -7,16 +7,29 @@ import { colors } from '../utils/theme';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getMessages } from '../redux/actions/messageActions';
 import { RefreshControl } from 'react-native';
-import { fireAuth } from '../firebase/firebase';
+import { fireAuth, fireStore } from '../firebase/firebase';
+import { getAllMessages } from '../redux/Messages/MessagesActions';
 
 const Messages = ({
-  getMessages,
+  getAllMessages,
   messages,
   navigation,
 }) => {
   const [refreshing, setRefreshing] = useState(false);
+  const [messagess, setMessages] = useState(null);
+  
   useEffect(() => {
-    getMessages()
+    fireStore
+      .collection('messages')
+      .where('members', 'array-contains', fireAuth.currentUser.uid)
+      .get()
+      .then(snapshot => {
+        const data = [];
+        snapshot.forEach(doc => {
+          data.push(doc.data())
+        })
+        setMessages(data)
+      })
   }, [])
 
   return (
@@ -25,20 +38,28 @@ const Messages = ({
       <AppHeader>
         <Text color='primary' fontSize={28} fontWeight='semi-bold'>Messages</Text>
       </AppHeader>
-      <ScrollView style={{ marginTop: 3 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={getMessages} />}>
-        { messages &&
-          messages.map((message, index) => {
-            // console.log(message.userInfo[1])
+      <ScrollView style={{ marginTop: 3 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {
+        fireStore
+        .collection('messages')
+        .where('members', 'array-contains', fireAuth.currentUser.uid)
+        .get()
+        .then(snapshot => {
+          const data = [];
+          snapshot.forEach(doc => {
+            data.push(doc.data())
+          })
+          setMessages(data)
+        })
+      }} />}>
+        { messagess &&
+          messagess.map((message, index) => {
             const { firstName, lastName, profileImage, userId } = message.userInfo[1];
-
             const userInfo = message.userInfo.find(user => user.userId !== fireAuth.currentUser.uid)
-          //  console.log(userInfo)
-          
+            const otherUser = message.members.find(user => user !== fireAuth.currentUser.uid)
             return (
               <ItemGroup key={index} onPress={() => {
                 navigation.navigate('chatroom', {
-                  message_session_id: message.message_session_id,
-                  userId: message.userId,
+                  userProfileId: otherUser,
                 })
               }}>
                 <ItemLabel>
@@ -59,11 +80,11 @@ const Messages = ({
 };
 
 const mapStateToProps = (state) =>({
-  messages: state.message_session.messages,
+  messages: state.messages.data,
 });
 
 const mapDispatchToProps = (dispatch) =>({
-  getMessages: () => dispatch(getMessages()),
+  getAllMessages: () => dispatch(getAllMessages()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messages);

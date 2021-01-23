@@ -7,90 +7,58 @@ import Text from '../components/Text';
 import { colors } from '../utils/theme';
 import { connect } from 'react-redux';
 import { fireAuth, fireStore } from '../firebase/firebase';
-import { getMessageSession, sendNewMessage } from '../redux/actions/messageActions';
-import uuid from 'react-uuid';
+import { createChatMessage, getChatMessageRoom } from '../redux/Messages/ChatRoomActions';
 
 const Messages = ({
   navigation,
   route,
-  session_id,
-  sendNewMessage,
+  getChatRoom,
+  createChatMessage,
+  chatroomID,
+  popChatSesionId,
 }) => {
-  const { message_session_id, userId } = route.params;
-  const [text, setText] = useState('');
-  const [messages, setMessages]: any = useState();
-
+  const { userProfileId } = route.params;
+  const [inputText, setInputText] = useState('');
+  const [messages, setMessages]: any = useState([]);
+  
   useEffect(() => {
-
-    // fireStore
-    //   .collection(`messages/${message_session_id}/chats`).orderBy('createdAt', 'asc')
-    //   .get()
-    //   .then(snapshot => {
-    //     snapshot.forEach(doc => {
-    //       const data = [];
-    //       data.push(doc.data())
-    //       return setMessages(doc.data())
-    //     })
-    //   })
-
+    getChatRoom(userProfileId)
     fireStore
-      .collection(`messages/${message_session_id}/chats`).orderBy('createdAt', 'asc')
-      .onSnapshot(query => {
-        query
-          .docChanges()
-          .map(({ doc }) => {
-            setMessages(prev => GiftedChat.append(prev, doc.data()))
+      .collection(`messages`)
+      .where('members', 'array-contains', fireAuth.currentUser.uid)
+      .get()
+      .then(async (snapshot) => {
+
+        snapshot.forEach(doc => {
+          doc.data().members.find(user => {
+            if(user == userProfileId) {
+              return fireStore
+              .collection(`messages/${doc.data().chatroomId}/chatroom`)
+              .orderBy('createdAt', 'asc')
+              .onSnapshot(query => {
+                query
+                  .docChanges()
+                  .forEach(({ doc }) => {
+                    setMessages(prev => GiftedChat.append(prev, doc.data()))
+                  })
+              }) 
+            }
           })
+        })
+        
       })
+
+  
   }, [])
 
-  const onSendMessage = async () => {
-    const data = {
-      session_id,
-      text,
-      userId,
-    };
-
-    const exists = await fireStore
-      .collection(`messages`)
-      .where('message_session_id', '==', message_session_id)
-      .get()
-      .then(snapshot => snapshot.empty);
-
-    console.log(exists)
-    if(exists == true) {
-      setMessages(prev => GiftedChat.append(prev, {
-        _id: uuid(), 
-          text,
-          createdAt: Date.now(), 
-          user: { 
-            avatar: fireAuth.currentUser.photoURL, 
-            name: fireAuth.currentUser.displayName, 
-            _id: fireAuth.currentUser.uid 
-          }
-      }))
-      return sendNewMessage(data)
-    }
-
-    return await fireStore
-      .collection(`messages/${message_session_id}/chats`)
-      .doc()
-      .set({
-        _id: uuid(), 
-          text,
-          createdAt: Date.now(), 
-          user: { 
-            avatar: fireAuth.currentUser.photoURL, 
-            name: fireAuth.currentUser.displayName, 
-            _id: fireAuth.currentUser.uid 
-          }
-      })
-  }
-
+  
   return (
     <Container>
       <AppHeader height={100}>
-        <TitleArea onStartShouldSetResponder={() => navigation.pop()}>
+        <TitleArea onStartShouldSetResponder={() => {
+          popChatSesionId()
+          navigation.pop()
+        }}>
           <Ionicons 
             color={colors.primary} 
             name='ios-arrow-back' 
@@ -101,10 +69,10 @@ const Messages = ({
       </AppHeader>
 
       <GiftedChat
-        onInputTextChanged={(text) => setText(text)}
-        text={text}
+        onInputTextChanged={(text) => setInputText(text)}
+        text={inputText}
         messages={messages}
-        onSend={() => onSendMessage()}
+        onSend={() => createChatMessage(userProfileId, inputText, chatroomID)}
         showAvatarForEveryMessage={true}
         renderUsernameOnMessage={true}
         renderAvatarOnTop={true}
@@ -135,13 +103,15 @@ const Messages = ({
 }
 
 const mapStateToProps = (state) => ({
-  chats: state.message_session.chats,
-  session_id: state.message_session.session,
+  chatroomID: state.chatroom.chatroomID
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getSession: (userData) => dispatch(getMessageSession(userData)),
-  sendNewMessage: (userData) => dispatch(sendNewMessage(userData)),
+  getChatRoom: (userProfileId) => dispatch(getChatMessageRoom(userProfileId)),
+  createChatMessage: (userProfileId, text, chatroomID) => dispatch(createChatMessage(userProfileId, text, chatroomID)),
+  popChatSesionId: () => dispatch({
+    type: 'POP_SESSION_ID',
+  })
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messages);

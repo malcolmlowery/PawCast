@@ -14,6 +14,7 @@ const UpdateProfile = ({ navigation }) => {
   const [image, setImage] = useState(null);
   const [location, setLocation] = useState('');
   const [email, setEmail] = useState('');
+  const [uploadingNewImage, setUploadingNewImage] = useState(false);
 
   const openImagePicker = async () => {
     let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -37,15 +38,23 @@ const UpdateProfile = ({ navigation }) => {
   }
 
   const onSubmit = async () => {
+
+    setUploadingNewImage(true)
+
     const imageBlob = await fetch(image).then(response => response.blob());
     const urlOfImage = await fireStorage
       .ref()
       .child(`image-${uuid()}.jpg`)
       .put(imageBlob)
       .then(snapshot => {
+        setUploadingNewImage(false)
         return snapshot.ref.getDownloadURL().then(url => url)
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        setUploadingNewImage(false)
+      })
+
+      setImage(urlOfImage)
       
       const uid = fireAuth.currentUser.uid;
         console.log(uid)
@@ -83,7 +92,15 @@ const UpdateProfile = ({ navigation }) => {
 
       <Content onStartShouldSetResponder={Keyboard.dismiss}>
         <ProfileImageContainer>
-          <ProfileImage source={{ uri: image != null ? image : fireAuth.currentUser.photoURL }} />
+          {
+            uploadingNewImage == false ?
+              <ProfileImage source={{ uri: image != null ? image : fireAuth.currentUser.photoURL }} />
+            :
+              <>
+                <ProfileImage source={{ uri: null }} />
+                <Text top={16} color='alert' fontWeight='semi-bold'>Please wait...</Text>
+              </>
+          }
         </ProfileImageContainer>
 
         <UpdateProfileImageContainer onPress={() => openImagePicker()}>

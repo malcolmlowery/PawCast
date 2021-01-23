@@ -1,22 +1,44 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import PremiumCard from '../../components/PremiumCard';
 import Text from '../../components/Text';
 import { colors } from '../../utils/theme';
-import { ScrollView, TouchableOpacity } from 'react-native';
+import { ScrollView, TouchableOpacity, View, Linking, Platform } from 'react-native';
 import Button from '../../components/Button';
 import { connect } from 'react-redux';
+import { getPremiumUserProfile } from '../../redux/actions/premiumAccountActions/getPremUserProfile';
+import { fireAuth } from '../../firebase/firebase';
 
 const PremiumProfile = ({
+  getUserProfile,
   navigation,
-  user
+  route,
+  user,
+  posts,
+  pets,
 }) => {
-
+  const { uid } = route.params;
+  
   useEffect(() => {
-    console.log('dsa', user)
+    getUserProfile(uid)
   }, [])
+
+  const colorSpec = () => {
+    if(user.specialty === 'breeder') {
+      return colors.primary
+    }
+    if(user.specialty === 'trainer') {
+      return '#9c27b0'
+    }
+    if(user.specialty === 'veterinarian') {
+      return '#26a69a'
+    } else {
+      return colors.primary
+    }
+  }
+
   return (
     <Container>
       <Header>
@@ -38,54 +60,265 @@ const PremiumProfile = ({
       <ScrollView style={{ marginBottom: 22 }}>
         <Content>
             <Title>
-              <Icon source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/pawcast-app-6daf2.appspot.com/o/image-dd3326-dc-f1fc-3bf8-e32c061252e1.jpg?alt=media&token=91b5d081-057b-4298-a7de-04a3457ebe84' }} />
-              <Text color='darkText' fontWeight='semi-bold' fontSize={26}>Malcolm Lowery</Text>
-              <Capsule style={{ backgroundColor: colors.primary, width: 100, alignItems: 'center', marginTop: 10 }}>
-                <Text color='white' fontWeight='semi-bold'>Breeder</Text>
+              <Icon source={{ uri: user.profileImage }} />
+              <Text color='darkText' fontWeight='semi-bold' fontSize={26}>{user.displayName}</Text>
+              <Capsule style={{ backgroundColor: colorSpec(), alignItems: 'center', marginTop: 10 }}>
+                <Text color='white' fontWeight='semi-bold'>{user.specialty}</Text>
               </Capsule>
             </Title>
 
             <Specialties>
               <SpecialtiesInfo>
                 <Text color='lightGray'>~ Doberman</Text>
-                <Text color='lightGray'>~ Miami, FL</Text>
+                  <Text color='lightGray'>~ {user.details?.city}</Text>
                 <Capsule style={{ backgroundColor: colors.alert }}>
-                  <Text color='white'>Verified</Text>
+                  { user.verified == true && <Text color='white'>Verified</Text> }
                 </Capsule>
               </SpecialtiesInfo>
-              <ButtonGroup>
-                <Button color='white' fill='primary' expand='none' width={200}>Send Message</Button>
-              </ButtonGroup>
+              { fireAuth.currentUser.uid !== user.uid &&
+                <ButtonGroup>
+                  <Button color='white' fill='primary' expand='none' width={200}>Send Message</Button>
+                </ButtonGroup>
+              }
+              <>
+              {
+                user.specialty === 'breeder' &&
+                <>
+                { user.details ? 
+                  <Bio>
+                    <BioTitle>
+                      <Text fontSize={18} fontWeight='semi-bold' color='darkText'>Details</Text>
+                    </BioTitle>
+
+                    <Text color='lightGray'>Farm Name: <Text color='darkText'>{user.details.farmName}</Text></Text>
+                    <Text color='lightGray'>Registered Breeder: <Text color='darkText'>{user.details.registeredBreeder ? 'Yes' : 'No'}</Text></Text>
+                    { user.details.breederId &&
+                      <Text color='lightGray'>Breeder ID: <Text color='darkText'>{user.details.breederId}</Text></Text>
+                    }
+                    <Text color='lightGray'>Year(s) in business: <Text color='darkText'>{user.details.yearsInBusiness}</Text></Text>
+                    <Text color='lightGray'>Location:</Text>
+                    <Text color='alert'fontWeight='semi-bold' onPress={() => {
+                      
+                      const {
+                        address,
+                        lat,
+                        lng,
+                      } = user.details;
+
+                      console.log(address,
+                        lat,
+                        lng,)
+
+
+                      const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+                      const latLng = `${lat},${lng}`;
+                      const label = `${address}`;
+                      const url = Platform.select({
+                        ios: `${scheme}${label}@${latLng}`,
+                        android: `${scheme}${latLng}(${label})`
+                      });
+
+                      Linking.openURL(url); 
+
+
+                    }}>{user.details.address} - {user.details.city}, {user.details.state}</Text>
+                  </Bio>
+                  :
+                  <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                    <>
+                    { fireAuth.currentUser.uid === uid &&
+                      <Button width={200} marginTop={20} fontWeight='semi-bold' fill='danger' onPress={() => navigation.push('addPremUserDetails', { specialty: user.specialty })}>Add business details</Button>
+                    }
+                    </>
+                  </View>
+                }
+                </>
+              }
+
+              {
+                user.specialty === 'trainer' &&
+                <>
+                { user.details ? 
+                  <Bio>
+                    <BioTitle>
+                      <Text fontSize={18} fontWeight='semi-bold' color='darkText'>Details</Text>
+                    </BioTitle>
+
+                    <Text color='lightGray'>Farm Name: <Text color='darkText'>{user.details.businessName}</Text></Text>
+                    <Text color='lightGray'>Specialized with Dobermanns: <Text color='darkText'>{user.details.specialized ? 'Yes' : 'No'}</Text></Text>
+                    <Text color='lightGray'>Training Styles: <Text color='darkText'>{user.details.trainingStyles}</Text></Text>
+                    <Text color='lightGray'>Year(s) in business: <Text color='darkText'>{user.details.yearsInBusiness}</Text></Text>
+                    <Text color='lightGray'>Location: <Text color='alert'fontWeight='semi-bold' onPress={() => {
+                      
+                      const {
+                        address,
+                        lat,
+                        lng,
+                      } = user.details;
+
+                      const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+                      const latLng = `${lat},${lng}`;
+                      const label = `${address}`;
+                      const url = Platform.select({
+                        ios: `${scheme}${label}@${latLng}`,
+                        android: `${scheme}${latLng}(${label})`
+                      });
+
+                      Linking.openURL(url); 
+
+
+                    }}>{user.details.address}, {user.details?.city}, {user.details.state}</Text></Text>
+                  </Bio>
+                  :
+                  <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                    <>
+                    { fireAuth.currentUser.uid === uid &&
+                      <Button width={200} fontWeight='semi-bold' fill='danger' onPress={() => navigation.push('addPremUserDetails', { specialty: user.specialty })}>Add business details</Button>
+                    }
+                    </>
+                  </View>
+                }
+                </>
+              }
+
+              {
+                user.specialty === 'veterinarian' &&
+                <>
+                { user.details ? 
+                  <Bio>
+                    <BioTitle>
+                      <Text fontSize={18} fontWeight='semi-bold' color='darkText'>Details</Text>
+                    </BioTitle>
+
+                    <Text color='lightGray'>Vet Business Name: <Text color='darkText'>{user.details.farmName}</Text></Text>
+                    <Text color='lightGray'>Year(s) in business: <Text color='darkText'>{user.details.yearsInBusiness}</Text></Text>
+                    <Text color='lightGray'>Shots: <Text color='darkText'>{user.details.registeredBreeder ? 'Yes' : 'No'}</Text></Text>
+                    <Text color='lightGray'>Location: <Text color='alert'fontWeight='semi-bold' onPress={() => {
+                      
+                      const {
+                        address,
+                        lat,
+                        lng,
+                      } = user.details;
+
+                      console.log(address,
+                        lat,
+                        lng,)
+
+
+                      const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+                      const latLng = `${lat},${lng}`;
+                      const label = `${address}`;
+                      const url = Platform.select({
+                        ios: `${scheme}${label}@${latLng}`,
+                        android: `${scheme}${latLng}(${label})`
+                      });
+
+                      Linking.openURL(url); 
+
+
+                    }}>{user.details.address}</Text></Text>
+                  </Bio>
+                  :
+                  <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                    <>
+                    { fireAuth.currentUser.uid === uid &&
+                      <Button width={200} fontWeight='semi-bold' fill='danger' onPress={() => navigation.push('addPremUserDetails', { specialty: user.specialty })}>Add business details</Button>
+                    }
+                    </>
+                  </View>
+                }
+                </>
+              }
+              </>
+
             </Specialties>
           
-            <DogContent>
-              <Text color='darkText' fontWeight='semi-bold' fontSize={18} position='relative' left={10}>Dobermans for Breeding</Text>
-              <ImageAndMap> 
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                  <DogImageContent>
-                    <Image source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/pawcast-app-6daf2.appspot.com/o/image-ccdb5e6-3e8d-7cf2-77bb-bf1141f10575.jpg?alt=media&token=38d1b34d-d19a-4598-ba2a-82105a023b5e' }} />
-                  </DogImageContent>
-                  <DogImageContent>
-                    <Image source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/pawcast-app-6daf2.appspot.com/o/image-dab82b-4cea-7d4-8375-1a8033edc26.jpg?alt=media&token=7d6ff0e9-bd78-444f-b62a-7ea5d8b082c2' }} />
-                  </DogImageContent>
-                  <AddPetIcon>
-                    <Ionicons color={colors.darkText} name='ios-add-circle' size={42} />
-                    <Text>Add new pet</Text>
-                  </AddPetIcon>
-                </ScrollView>
-              </ImageAndMap>
-            </DogContent>
+            { user.specialty === 'breeder' &&
+              <DogContent>
+                <Text color='darkText' fontWeight='semi-bold' fontSize={18} position='relative' left={10}>Dobermans for Breeding</Text>
+                <ImageAndMap> 
+                  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                    { pets !== undefined && 
+                      pets.map((pet, i) => {
+                        return (
+                          <DogImageContent>
+                            <Image source={{ uri: pet.image[0] }} />
+                          </DogImageContent>
+                        )
+                      })
+                    }
+                    { fireAuth.currentUser.uid == user.uid &&
+                      <AddPetIcon onPress={() => navigation.push('premium-newDogBreed')}>
+                        <Ionicons color={colors.white} name='ios-add-circle' size={42} />
+                        <Text color='white'>Add new pet</Text>
+                      </AddPetIcon>
+                    }
+                  </ScrollView>
+                </ImageAndMap>
+              </DogContent>
+            } 
 
             <MapContent>
               <Text color='darkText' fontWeight='semi-bold' fontSize={18} position='relative'>Location</Text>
               <Map>
-                <MapView style={{ flex: 1 }} />
+                <MapView 
+                  region={{
+                    latitude: user.details?.lat,
+                    longitude: user.details?.lng,
+                    latitudeDelta: 0.0001,
+                    longitudeDelta: 0.03,
+                  }}
+                  style={{ flex: 1 }} 
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: user.details?.lat,
+                      longitude: user.details?.lng,
+                    }}
+                  />
+                </MapView>
               </Map>
             </MapContent>
 
-            <Text fontSize={18} fontWeight='semi-bold' position='relative' left={10}>Posts</Text>
+            <TextBox>
+              <Text fontSize={18} fontWeight='semi-bold' position='relative' left={10}>Posts</Text>
+            </TextBox>
+            { posts &&
+            posts.map((post, index) => {
+              
+              const specialtyColor = () => {
+                if(post.postOwner.specialty === 'breeder') {
+                  return colors.primary
+                }
+                if(post.postOwner.specialty === 'trainer') {
+                  return '#9c27b0'
+                }
+                if(post.postOwner.specialty === 'veterinarian') {
+                  return '#26a69a'
+                } else {
+                  return colors.primary
+                }
+              }
 
-            <PremiumCard />
+              return (
+                <PremiumCard
+                  key={index}
+                  navigationToProfile={() => navigation.push('premium-profile', { uid: post.postOwner.uid })}
+                  profileImage={post.postOwner?.profileImage}
+                  desc={post.desc}
+                  specialty={post.postOwner.specialty}
+                  verified={post.postOwner.verified}
+                  city={post.postOwner.location.city}
+                  state={post.postOwner.location.state}
+                  postImages={post.postImages}
+                  displayName={post.displayName}
+                  dogType={post.dogType}
+                  capsuleColor={specialtyColor()}
+                />
+              )
+            })
+          }
         </Content>
       </ScrollView>
 
@@ -94,10 +327,16 @@ const PremiumProfile = ({
 };
 
 const mapStateToProps = (state) => ({
-  user: state.user
-})
+  user: state.premiumProfile.user,
+  posts: state.premiumProfile.posts,
+  pets: state.premiumProfile.pets,
+});
 
-export default connect(mapStateToProps, null)(PremiumProfile);
+const mapDispatchToProps = (dispatch) => ({
+  getUserProfile: (uid) => dispatch(getPremiumUserProfile(uid))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PremiumProfile);
 
 const Container = styled.View`
   flex: 1;
@@ -116,7 +355,6 @@ const Header = styled.View`
 
 const Capsule = styled.View`
   border-radius: 20px;
-  margin-left: 10px;
   padding: 5px 12px;
 `;
 
@@ -164,6 +402,7 @@ const MapContent = styled.View`
   height: 210px;
   margin: 0 10px;
   margin-bottom: 16px;
+  margin-top: 16px;
   overflow: hidden;
 `;
 
@@ -173,7 +412,7 @@ const Map = styled.View`
   height: 171px;
   overflow: hidden;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 6px;
   position: relative;
   top: 10px;
 `;
@@ -191,7 +430,7 @@ const Image = styled.Image`
 const ButtonGroup = styled.View`
   align-items: center;
   margin-top: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 `;
 
 const SpecialtiesInfo = styled.View`
@@ -200,11 +439,28 @@ const SpecialtiesInfo = styled.View`
   justify-content: space-evenly;
 `;
 
-const AddPetIcon = styled.View`
+const AddPetIcon = styled.TouchableOpacity`
   align-items: center;
-  background-color: #f2f2f2;
+  background-color: ${colors.primary};
   border-radius: 16px;
   justify-content: center;
   margin: 0 10px;
   width: 200px;
+`;
+
+const TextBox = styled.View`
+  margin-top: 4px;
+  margin-bottom: 20px;
+`;
+
+const Bio = styled.View`
+  background-color: #fff;
+  height: 160px;
+  padding: 0 10px;
+  justify-content: space-evenly;
+  margin-bottom: 6px;
+  margin-top: 8px;
+`;
+
+const BioTitle = styled.View`
 `;

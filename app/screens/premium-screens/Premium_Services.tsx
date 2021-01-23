@@ -31,7 +31,7 @@ const PremiumServices = ({ route, upgradeUser, user, navigation }) => {
 
         <ButtonGroup>
           <Button fontSize={14} height={38} expand='none' onPress={() => upgradeUser(specialty.toLowerCase()).then(() => navigation.pop(2))}>Verify My Account</Button>
-          <Button fontSize={14} height={38} expand='none' fill='alert'>Cancel</Button>  
+          <Button fontSize={14} height={38} expand='none' onPress={() => navigation.pop(2)} fill='alert'>Cancel</Button>  
         </ButtonGroup>
   </Content>
 

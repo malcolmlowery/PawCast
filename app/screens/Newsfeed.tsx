@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RefreshControl } from 'react-native';
+import { Alert, RefreshControl } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
@@ -9,17 +9,17 @@ import Card from '../components/Card';
 import CreatePostForm from '../components/CreatePostForm';
 import Text from '../components/Text';
 import { fireAuth } from '../firebase/firebase';
-import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { createNewPost, deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
 import { getAllDobermannsByCount } from '../redux/actions/dobermanCountActions';
 import { addCommentToPost, fetchPosts } from '../redux/actions/getPostAction';
 import { hidePost, reportUser } from '../redux/actions/userReportingActions';
 import { colors } from '../utils/theme';
+import * as ImagePicker from 'expo-image-picker';
 
 const Newsfeed: React.FC<any> = ({ 
   addComment,
   deletePost,
   getPosts, 
-  getAllDobermanns,
   isLoading,
   likePost,
   navigation,
@@ -30,14 +30,44 @@ const Newsfeed: React.FC<any> = ({
   updatePost,
   hidePost,
   reportUser,
+  createPost,
 }) => {
 
   useEffect(() => {
     getPosts()
-    // getAllDobermanns()
   }, [])
 
   const [postFormVisible, setPostFormVisible] = useState(false);
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null);
+
+  const openImagePicker = async () => {
+    let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+    });
+    
+    if(permissionResult.granted === false) {
+      return (
+        Alert.alert(
+          'Permission Denied',
+          'Permission to access camera roll is required!'
+        )
+      )
+    }
+        
+    if(!result.cancelled) {
+      setImage(result.uri)
+    }
+  }
+
+  const onSubmitPost = async () => {
+    const userInput = { description, image };
+    createPost(userInput).then(() => setPostFormVisible(false))
+  }
 
   return (
     <>
@@ -45,7 +75,13 @@ const Newsfeed: React.FC<any> = ({
       { 
         postFormVisible &&
         <CreatePostForm 
+          submit={() => onSubmitPost()}
           visible={() => setPostFormVisible(!postFormVisible)}
+          text={description}
+          onChangeText={(text => setDescription(text))}
+          imageUri={(uri) => console.log(uri)}
+          openImagePicker={() => openImagePicker()}
+          image={image}
         /> 
       }
 
@@ -178,6 +214,7 @@ const mapDispatchToProps = (dispatch) => ({
   getAllDobermanns: () => dispatch(getAllDobermannsByCount()),
   hidePost: (postId) => dispatch(hidePost(postId)),
   reportUser: (userId) => dispatch(reportUser(userId)),
+  createPost: (userInput) => dispatch(createNewPost(userInput)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Newsfeed);

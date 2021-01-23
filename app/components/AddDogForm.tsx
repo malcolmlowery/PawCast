@@ -76,6 +76,7 @@ const AddDogForm = ({
   const [earCrop, setEarCrop] = useState('');
   const [tailCrop, setTailCrop] = useState('');
   const [personality, setpPersonality] = useState('');
+  const [shiftCard, setShiftCard] = useState(false);
 
   const openImagePicker = async () => {
     const premissions = await ImagePicker.requestCameraPermissionsAsync();
@@ -118,7 +119,7 @@ const AddDogForm = ({
     <>
       <Backdrop />
       <Container onStartShouldSetResponder={Keyboard.dismiss}>
-        <KeyboardAvoidingView behavior='position' contentContainerStyle={{ paddingBottom: 30 }}>
+        <KeyboardAvoidingView enabled={shiftCard} behavior='position' contentContainerStyle={{ paddingBottom: 30 }}>
           <Card>
             <CardHeader>
               <Text color='primary' fontSize={18} fontWeight='semi-bold'>New Dog</Text>
@@ -127,7 +128,7 @@ const AddDogForm = ({
             <Content>
               <ScrollView style={{ height: 250, paddingBottom: 20, marginTop: 20, borderBottomColor: '#f2f2f2', borderBottomWidth: 1 }}>
                 <View style={{ paddingBottom: 20 }}>
-                  <TextInput label='Name' onChangeText={(text) => setName(text)} value={name} />
+                  <TextInput label='Name' onChangeText={(text) => setName(text)} value={name} onFocus={() => setShiftCard(false)}  />
                   <DropDown 
                     title='Breed'
                     onValueChange={(value) => setBreed(value)}

@@ -19,15 +19,32 @@ export const upgradeUserProfile = (specialty) => {
   return async (dispatch) => {
     dispatch(upgradeUserRequest())
 
-    const uid = fireAuth.currentUser.uid;
+    const user = fireAuth.currentUser;
     
-    fireStore
-      .collection('users')
-      .doc(uid)
+    const userLocation = await fireStore
+      .collection('user_locations')
+      .where('uid', '==', user.uid)
+      .get()
+      .then(snapshot => {
+        return snapshot.docs.map(s => s.data())
+      })
+      .catch((error) => console.log(error))
+console.log(userLocation[0])
+    await fireStore
+      .collection('premium_users')
+      .doc(user.uid)
       .set({
+        uid: user.uid,
+        displayName: user.displayName,
+        profileImage: user.photoURL,
         premium_user: true,
+        city: userLocation[0].city,
+        state: userLocation[0].state,
+        lat: userLocation[0].lat,
+        lng: userLocation[0].lng,
+        verified: true,
         specialty
-      }, { merge: true })
+      })
       .then(() => {
         const premium_user = true;
         dispatch(upgradeUserSuccess(premium_user))

@@ -41,6 +41,8 @@ const Profile = ({
   const [postFormVisible, setPostFormVisible] = useState(false);
   const [addDogFormVisible, setAddDogFormVisible] = useState(false);
   const [bannerImage, setBannerImage] = useState(null);
+  const [uploadingNewImage, setUploadingNewImage] = useState(false);
+  const [session, setSession] = useState(null) 
 
   const openImagePicker = async () => {
     const result: any = await ImagePicker.launchImageLibraryAsync({
@@ -49,7 +51,7 @@ const Profile = ({
 
     if(!result.cancelled) {
       const imageBlob = await fetch(result.uri).then(res => res.blob());
-
+      setUploadingNewImage(true)
       fireStorage
         .ref()
         .child(`banners/bannerImg-${uuid()}`)
@@ -62,6 +64,7 @@ const Profile = ({
             snapshot.forEach(doc => doc.ref.update({ bannerImage: url }))
           })
           setBannerImage(url)
+          setUploadingNewImage(false);
         })
     }
   }
@@ -90,23 +93,32 @@ const Profile = ({
 
         <ScrollView style={{ marginBottom: 24 }}>
           <Content>
-            <Banner>
-              { !isLoading && 
-                <>
-                <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage  }} />
-                { route.params.uid === fireAuth.currentUser.uid &&
-                  <BannerButton onPress={() => openImagePicker()}>
-                    <Ionicons 
-                      color={colors.primary} 
-                      name='ios-camera'
-                      size={34} 
-                      onPress={() => {}}
-                    />
-                  </BannerButton>
+            { uploadingNewImage == false ?
+              <Banner>
+                { !isLoading && 
+                  <>
+                  <BannerImage source={{ uri: bannerImage !== null ? bannerImage : userInfo?.bannerImage  }} />
+                  { route.params.uid === fireAuth.currentUser.uid &&
+                    <BannerButton onPress={() => openImagePicker()}>
+                      <Ionicons 
+                        color={colors.primary} 
+                        name='ios-camera'
+                        size={34} 
+                        onPress={() => openImagePicker()}
+                      />
+                    </BannerButton>
+                  }
+                  </>
                 }
-                </>
-              }
-            </Banner>
+              </Banner>
+              :
+              <Banner>
+                <BText>
+                  <Text color='white' fontWeight='semi-bold' fontSize={18}>Uploading Image</Text>
+                  <Text color='white'>Please wait...</Text>
+                </BText>
+              </Banner>
+            }
             
             { !isLoading ?
               <ProfileImageContainer>
@@ -152,8 +164,7 @@ const Profile = ({
                   fill='primary' 
                   fontSize={14} 
                   width={170}  
-                  onPress={() => navigation.push('chatroom', { 
-                    message_session_id: null,
+                  onPress={() => navigation.navigate('chatroom', {
                     city: userInfo.city,
                     firstName: userInfo.firstName,
                     lastName: userInfo.lastName,
@@ -161,6 +172,7 @@ const Profile = ({
                     state: userInfo.state,
                     userId: userInfo.userId,
                     zipcode: userInfo.zipcode,
+                    userProfileId: route.params.uid,
                   })}
                 >
                   Send Message
@@ -311,6 +323,7 @@ const Content = styled.View`
 const Banner = styled.View`
   background: ${colors.primary};
   height: 200px;
+  justify-content: center;
 `;
 
 const BannerImage = styled.Image`
@@ -324,6 +337,7 @@ const ProfileImageContainer = styled.View`
   position: absolute;
   top: 150px;
   width: 100%;
+  z-index: 1;
 `;
 
 const ProfileImage = styled.Image`
@@ -387,10 +401,17 @@ const BannerButton = styled.TouchableOpacity`
   align-items: center;
   background: #fff;
   border-radius: 25px;
-  bottom: 10px;
-  height: 50px;
+  height: 100px;
   justify-content: center;
   position: absolute; 
-  right: 10px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  right: 0;
   width: 50px;
+  z-index: 1100;
+`;
+
+const BText = styled.View`
+  align-items: center;
+  justify-content: center;
 `;

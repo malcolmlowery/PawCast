@@ -23,7 +23,6 @@ export const fetchUserPosts = (userId) => {
     try {
       dispatch(getUserPostRequest())
       const uid = await fireAuth.currentUser.uid;
-      console.log(uid)
       const userInfo = await fireAuth.currentUser;
       
       const postsData = await fireStore

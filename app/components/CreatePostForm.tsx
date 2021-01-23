@@ -9,37 +9,17 @@ import Button from './Button';
 import Text from './Text';
 import { createNewPost } from '../redux/actions/createPostAction';
 
-const CreatePostForm = ({ createPost, creatingPost, visible }) => {
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState(null);
-
-  const openImagePicker = async () => {
-    let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    let result: any = await ImagePicker.launchImageLibraryAsync({
-      base64: true,
-      quality: 1,
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-    });
-    
-    if(permissionResult.granted === false) {
-      return (
-        Alert.alert(
-          'Permission Denied',
-          'Permission to access camera roll is required!'
-        )
-      )
-    }
-        
-    if(!result.cancelled) {
-      setImage(result.uri)
-    }
-  }
-
-  const onSubmit = async () => {
-    const userInput = { description, image };
-    createPost(userInput).then(() => visible(false))
-  }
+const CreatePostForm = ({ 
+  createPost, 
+  creatingPost, 
+  visible, 
+  submit, 
+  onChangeText, 
+  text,
+  openImagePicker,
+  image
+}) => {
+  
 
   return (
     <>
@@ -52,7 +32,7 @@ const CreatePostForm = ({ createPost, creatingPost, visible }) => {
             </CardHeader>
 
             <Content>
-              <TextInput multiline={true} onChangeText={(text) => setDescription(text)} value={description} />
+              <TextInput multiline={true} onChangeText={onChangeText} value={text} />
               <ImageSection>
                 <Icon onPress={() => openImagePicker()}>
                   <Text fontSize={12}>Add Image</Text>
@@ -87,7 +67,7 @@ const CreatePostForm = ({ createPost, creatingPost, visible }) => {
                     expand='none'
                     height={34}
                     marginBottom={10}
-                    onPress={() => onSubmit()}
+                    onPress={() => submit()}
                     width={145}>
                       Post
                   </Button>

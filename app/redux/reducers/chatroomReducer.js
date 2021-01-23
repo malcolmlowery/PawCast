@@ -7,28 +7,22 @@ const SEND_MESSAGE_FAILURE = 'SEND_MESSAGE_FAILURE';
 const CREATE_MESSAGE_SUCCESS = 'CREATE_MESSAGE_SUCCESS';
 
 const initialState = {
-  messages: [],
-  message_session_id: null
+  chatroomID: null
 };
 
 export const chatroomReducer = (state = initialState, action) => {
   switch(action.type) {
-    case GET_CHAT_REQUEST: return {
-      ...state,
-      messages: []
-    }
     case GET_CHAT_SUCCESS: return {
       ...state,
-      messages: action.payload
+      chatroomID: action.payload
     }
-    case SEND_MESSAGE_SUCCESS: return {
-      ...state,
-      messages: [action.payload].concat(state.messages)
+    case 'POP_SESSION_ID': {
+      console.log(state.chatroomID)
+      return {
+        ...state,
+        chatroomID: null,
+      }
     }
-    // case CREATE_MESSAGE_SUCCESS: return {
-    //   ...state,
-    //   message_session_id: action.payload
-    // }
     default: return state
   }
 };

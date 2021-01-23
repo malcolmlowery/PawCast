@@ -116,7 +116,6 @@ export const getMessageSession = (userId) => {
 
 export const sendNewMessage = (userData) => {
   return async (dispatch) => {
-
     const {
       session_id,
       text,
@@ -129,6 +128,26 @@ export const sendNewMessage = (userData) => {
     const message_session_id = messagesCollection.doc().id;
     const messageDoc = await messagesCollection.where('member_uids', '==', [currentUserUID, userId]).get();
      
+    console.log('Chat exists: ', !messageDoc.empty)
+
+    if(session_id !== null && messageDoc.empty !== false) {
+      dispatch(newMessageRequest())
+
+      await fireStore
+        .collection(`messages/${session_id}/chats`)
+        .doc()
+        .set({
+          _id: uuid(), 
+          text,
+          createdAt: Date.now(), 
+          user: { 
+            avatar: fireAuth.currentUser.photoURL, 
+            name: fireAuth.currentUser.displayName, 
+            _id: fireAuth.currentUser.uid 
+          }
+        })
+    }
+    
     if(session_id == null || messageDoc.size === 0) {
       dispatch(newMessageRequest())
 

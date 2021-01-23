@@ -3,7 +3,6 @@ import styled from 'styled-components/native';
 import { colors } from '../utils/theme';
 import Text from './Text';
 import Button from './Button';
-import { ScrollView } from 'react-native';
 
 const PremiumCard = ({
   navigationToProfile,
@@ -44,11 +43,13 @@ const PremiumCard = ({
             </Specialties>
           }
           
-          <CardDesc>
-            <Text>{desc}</Text>
-          </CardDesc>
+          { desc !== '' && 
+            <CardDesc>
+              <Text>{desc}</Text>
+            </CardDesc>
+          }
 
-          { postImages && 
+          { postImages.length > 0 && 
             <CardImageGroup>
                 <CardImage source={{ uri: postImages[0] }} />
             </CardImageGroup>
@@ -115,6 +116,7 @@ const Specialties = styled.View`
 const CardDesc = styled.View`
   margin-top: 10px;
   padding: 0 10px 0 10px;
+  margin-bottom: 6px;
 `;
 
 const CardImageGroup = styled.View`

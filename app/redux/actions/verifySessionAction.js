@@ -42,12 +42,11 @@ export const verifyUserSession = () => {
           if(user !== null) {
 
             const userData = await fireStore
-              .collection('users')
-              .where('userId', '==', user.uid)
+              .collection('premium_users')
+              .where('uid', '==', user.uid)
               .get()
               .then(snapshot => {
-                // console.log(snapshot.docs.map(s => s.data()))
-                return snapshot.docs.map(s => s.data())
+                  return snapshot.docs.map(s => s.data())
               })
 
             dispatch(verifySessionSuccess(userData[0]))

@@ -14,6 +14,7 @@ interface TextI {
   position?: 'relative' | 'absolute'
   right?: number
   top?: number
+  onPress?: () => void
 }
 
 const Text: React.FC<TextI> = ({ 
@@ -27,7 +28,8 @@ const Text: React.FC<TextI> = ({
   marginRight,
   position,
   right,
-  top ,
+  top,
+  onPress
 }) => {
 
   const fntWeight = () => {
@@ -62,6 +64,7 @@ const Text: React.FC<TextI> = ({
         right,
         top,
       }}
+      onPress={onPress}
     >
       {children}
     </TextComp>

@@ -20,6 +20,8 @@ import ReportedUsers from './screens/ReportUsers';
 import PremiumProfile from './screens/premium-screens/PremiumProfile';
 import PremiumSignUp from './screens/premium-screens/Premium_Signup';
 import PremiumServices from './screens/premium-screens/Premium_Services';
+import newDogBreedForm from './screens/premium-screens/newDogBreedForm';
+import AddBusinessDetails from './screens/premium-screens/AddBusinessDetails';
 
 const Stack = createStackNavigator();
 
@@ -28,9 +30,6 @@ const Navigation = ({ isAuthenticated, isAuthenticating, verifyUser }) => {
   useEffect(() => {
     verifyUser()
   }, [])
-
-  console.log('isAuthenticating ', isAuthenticating)
-  console.log('isAuthenticated ', isAuthenticated)
   
   return (
     <>
@@ -61,6 +60,8 @@ const Navigation = ({ isAuthenticated, isAuthenticating, verifyUser }) => {
               <Stack.Screen name='premium-profile' component={PremiumProfile} options={{ headerShown: false }} />
               <Stack.Screen name='premium-signup' component={PremiumSignUp} options={{ headerShown: false }} />
               <Stack.Screen name='premium-services' component={PremiumServices} options={{ headerShown: false }} />
+              <Stack.Screen name='premium-newDogBreed' component={newDogBreedForm} options={{ headerShown: false }} />
+              <Stack.Screen name='addPremUserDetails' component={AddBusinessDetails} options={{ headerShown: false }} />
             </Stack.Navigator>
             </>
           }

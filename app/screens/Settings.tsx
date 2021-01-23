@@ -34,7 +34,8 @@ const Settings = ({ logout, navigation }) => {
             <CircleButtonLabel>Update Profile</CircleButtonLabel>
           </CircleButtonItem>
 
-          { fireAuth.currentUser.uid === 'g3HnPctmsnedxvFzAqPvpb64Dks1' &&
+          { 
+            fireAuth.currentUser.uid === 'g3HnPctmsnedxvFzAqPvpb64Dks1' &&
             <CircleButtonItem>
               <CircleButtonIcon onPress={() => navigation.push('reported')}>
                 <Ionicons name='ios-warning' color='#fff' size={32} />
