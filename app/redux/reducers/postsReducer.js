@@ -70,7 +70,7 @@ export const postReducer = (state = intialState, action) => {
     }
     case CREATE_POST_FAILURE: return {
       ...state,
-      creatingPost: true,
+      creatingPost: false,
       error: action.payload
     }
     case 'SHOW_OPTIONS_MODE': return {

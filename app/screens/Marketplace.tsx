@@ -59,7 +59,8 @@ const Marketplace = ({
   user,
   posts,
   isLoading,
-  filterByType
+  filterByType,
+  creatingPost
 }) => {
 
   useEffect(() => {
@@ -97,16 +98,18 @@ const Marketplace = ({
 
   const onSubmitPost = () => {
     const userInput = { description, image };
-    createPost(userInput)
+    createPost(userInput).then(() => setPostFormVisible(false))
   }
 
   return (
     <>
-      { 
+      {
         postFormVisible &&
         <CreatePostForm 
           submit={() => onSubmitPost()}
-          visible={() => setPostFormVisible(!postFormVisible)}
+          visible={() => {
+            setPostFormVisible(!postFormVisible)
+          }}
           text={description}
           onChangeText={(text => setDescription(text))}
           openImagePicker={() => openImagePicker()}
@@ -125,10 +128,11 @@ const Marketplace = ({
               left={10}>
                 Marketplace
             </Text>
-
-            <ProfileButton onPress={() => navigation.push('premium-profile', { uid: fireAuth.currentUser.uid })}>
-              <Icon source={{ uri: fireAuth.currentUser.photoURL }} />
-            </ProfileButton>
+            { user?.premium_user &&
+              <ProfileButton onPress={() => navigation.push('premium-profile', { uid: fireAuth.currentUser.uid })}>
+                <Icon source={{ uri: fireAuth.currentUser.photoURL }} />
+              </ProfileButton>
+            }
           </HeaderTitle>
           <HeaderOptions>
             { user?.premium_user ?
@@ -209,12 +213,17 @@ const mapStateToProps = (state) => ({
   user: state.user?.user,
   posts: state.premiumPosts?.posts,
   isLoading: state.premiumPosts?.isLoading,
+  // creatingPost: state.premiumPosts?.creatingPost,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   createPost: (userInput) => dispatch(createPremiumPost(userInput)),
   getPosts: () => dispatch(getPremiumPosts()),
-  filterByType: (filterType) => dispatch(filterByType(filterType))
+  filterByType: (filterType) => dispatch(filterByType(filterType)),
+  createPostMode: (createPostMode) => dispatch({
+    type: 'CREATE_POST_MODE',
+    payload: createPostMode,
+  }),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Marketplace);

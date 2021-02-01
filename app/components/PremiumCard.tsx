@@ -31,13 +31,15 @@ const PremiumCard = ({
         </Header>
         <Content>
           
-          { verified &&
+
+          { specialty === 'breeder' &&
             <Specialties>
               <Text color='lightGray'>~ {dogType}</Text>
               <Text color='lightGray'>~ {city}, {state}</Text>
               { verified &&
                 <Capsule style={{ backgroundColor: colors.alert }}>
-                  <Text color='white'>Verified</Text>
+                  <Text fontSize={10} fontWeight='bold' color='white'>PENDING</Text>
+                  <Text color='white'>Verification</Text>
                 </Capsule>
               }
             </Specialties>

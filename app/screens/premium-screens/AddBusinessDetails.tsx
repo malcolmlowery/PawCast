@@ -13,34 +13,38 @@ const AddBusinessDetails = ({
   navigation,
   route,
   addDetails,
+  pleaseWait,
 }) => {
 
-  const { specialty } = route.params;
+  const { 
+    specialty,
+    editMode,
+    registeredBreeder,
+  } = route.params;
 
-  const [farmName, setFarmName] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [businessName, setBusinessName] = useState('');
+  const [farmName, setFarmName] = useState(route.params.farmName);
+  const [address, setAddress] = useState(route.params.address);
+  const [city, setCity] = useState(route.params.city);
+  const [state, setState] = useState(route.params.state);
+  const [zipcode, setZipcode] = useState(route.params.zipcode);
+  const [businessName, setBusinessName] = useState(route.params.businessName);
   const [regBreeder, setRegBreeder] = useState('');
-  const [yearsInBusiness, setYearsInBusiness] = useState(null);
-  const [specialized, setSpecialized] = useState('');
-  const [ears, setEars] = useState('');
-  const [tail, setTail] = useState('');
-  const [breederId, setBreederId] = useState('');
-  const [trainingStyles, setTrainingStyles] = useState('');
+  const [yearsInBusiness, setYearsInBusiness] = useState(route.params.yearsInBusiness);
+  const [specialized, setSpecialized] = useState(route.params.specialized);
+  const [ears, setEars] = useState(route.params.ears);
+  const [tail, setTail] = useState(route.params.tail);
+  const [breederId, setBreederId] = useState(route.params.breederId);
+  const [trainingStyles, setTrainingStyles] = useState(route.params.trainingStyles);
+  const [shots, setShots] = useState(route.params.shots);
 
   const onSubmit = async () => {
 
     const streetName = address.replace( /\s/g, '+').substring(1);
-    console.log(streetName)
 
-    const coord = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${streetName},+${city},+${state}&key=AIzaSyAOVOe0iFeZTy2jp83N2XQwY7AsHD-BN8Q`)
+    const coord = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address},+components=postal_code:${zipcode},+${city},+${state}&key=AIzaSyAOVOe0iFeZTy2jp83N2XQwY7AsHD-BN8Q`)
       .then(data => data.json())
       .then(res => res.results[0].geometry.location)
-      .catch(error => console.log(error))
-
-      console.log(coord) 
+      .catch(error => console.log(error)) 
 
       if(specialty === 'breeder') {
         const userInput = {
@@ -52,8 +56,9 @@ const AddBusinessDetails = ({
           farmName,
           yearsInBusiness,
           breederId,
+          zipcode
         }
-        return addDetails(userInput)
+        return addDetails(userInput).then(() => navigation.pop())
       }
       if(specialty === 'trainer') {
         const userInput = {
@@ -65,9 +70,10 @@ const AddBusinessDetails = ({
           specialized,
           yearsInBusiness,
           businessName,
-          trainingStyles
+          trainingStyles,
+          zipcode
         }
-        return addDetails(userInput)
+        return addDetails(userInput).then(() => navigation.pop())
       }
       if(specialty === 'veterinarian') {
         const userInput = {
@@ -76,8 +82,14 @@ const AddBusinessDetails = ({
           city,
           state,
           address,
+          zipcode,
+          businessName,
+          yearsInBusiness,
+          ears,
+          tail,
+          shots,
         }
-        return addDetails(userInput)
+        return addDetails(userInput, editMode).then(() => navigation.pop())
       }
   }
 
@@ -112,6 +124,7 @@ const AddBusinessDetails = ({
             <LocationContainer>
               <Text fontSize={20} fontWeight='semi-bold'>Location</Text>
               <TextInput label='Address' placeholder='N/A' onChangeText={(text) => setAddress(text)} value={address} />
+              <TextInput label='Zip code' placeholder='N/A' onChangeText={(text) => setZipcode(text)} value={zipcode} />
               {/* <TextInput label='Suite/Unit' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} /> */}
               <TextInput label='City' placeholder='N/A' onChangeText={(text) => setCity(text)} value={city} />
               <TextInput label='State' placeholder='N/A' onChangeText={(text) => setState(text)} value={state} />
@@ -129,6 +142,7 @@ const AddBusinessDetails = ({
             <LocationContainer>
             <Text fontSize={20} fontWeight='semi-bold'>Location</Text>
               <TextInput label='Address' placeholder='N/A' onChangeText={(text) => setAddress(text)} value={address} />
+              <TextInput label='Zip code' placeholder='N/A' onChangeText={(text) => setZipcode(text)} value={zipcode} />
               {/* <TextInput label='Suite/Unit' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} /> */}
               <TextInput label='City' placeholder='N/A' onChangeText={(text) => setCity(text)} value={city} />
               <TextInput label='State' placeholder='N/A' onChangeText={(text) => setState(text)} value={state} />
@@ -140,33 +154,44 @@ const AddBusinessDetails = ({
         { specialty === 'veterinarian' &&
         <Content>
             <TextInput label='Business Name' placeholder='N/A' onChangeText={(text) => setBusinessName(text)} value={businessName} />
-            <TextInput label='Registered Breeder' placeholder='Yes or No' onChangeText={(text) => setRegBreeder(text)} value={regBreeder} />
             <TextInput label='Years In Business' placeholder='N/A' onChangeText={(text) => setYearsInBusiness(text)} value={yearsInBusiness} />
             <TextInput label='Do you crop ears?' placeholder='Yes or No' onChangeText={(text) => setEars(text)} value={ears} />
             <TextInput label='Do you crop tail?' placeholder='Yes or No' onChangeText={(text) => setTail(text)} value={tail} />
+            <TextInput label='What shots do you offer?' placeholder='Deworming, Rabies' onChangeText={(text) => setShots(text)} value={shots} />
             <LocationContainer>
-              <Text fontSize={20} fontWeight='semi-bold'>Location</Text>
-              <TextInput label='Address' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} />
-              <TextInput label='Suite/Unit' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} />
-              <TextInput label='City' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} />
-              <TextInput label='State' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} />
-              <TextInput label='Zip code' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} />
+            <Text fontSize={20} fontWeight='semi-bold'>Location</Text>
+              <TextInput label='Address' placeholder='N/A' onChangeText={(text) => setAddress(text)} value={address} />
+              <TextInput label='Zip code' placeholder='N/A' onChangeText={(text) => setZipcode(text)} value={zipcode} />
+              {/* <TextInput label='Suite/Unit' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} /> */}
+              <TextInput label='City' placeholder='N/A' onChangeText={(text) => setCity(text)} value={city} />
+              <TextInput label='State' placeholder='N/A' onChangeText={(text) => setState(text)} value={state} />
+              {/* <TextInput label='Zip code' placeholder='N/A' onChangeText={(text) => setFarmName(text)} value={farmName} /> */}
             </LocationContainer>
           </Content> 
         }
 
-        <Button marginTop={20} width={300} onPress={onSubmit}>Submit</Button>
+        <ButtonBox>
+          { pleaseWait !== true ?
+            <Button marginTop={20} width={300} onPress={onSubmit}>Submit</Button>
+            :
+            <Button marginTop={20} fill='alert' width={300}>Please wait...</Button>
+          }
+        </ButtonBox>
       </ScrollView>
 
     </Container>
   )
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  addDetails: (userInput) => dispatch(addBusinessDetails(userInput))
+const mapStateToProps = (state) => ({
+  pleaseWait: state.addBusiness.pleaseWait
 })
 
-export default connect(null, mapDispatchToProps)(AddBusinessDetails);
+const mapDispatchToProps = (dispatch) => ({
+  addDetails: (userInput, editMode) => dispatch(addBusinessDetails(userInput, editMode))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddBusinessDetails);
 
 const Container = styled.View`
   flex: 1;
@@ -189,4 +214,8 @@ const Content = styled.View`
 
 const LocationContainer = styled.View`
   margin-top: 10px;
+`;
+
+const ButtonBox = styled.View`
+  align-items: center;
 `;

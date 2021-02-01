@@ -15,9 +15,11 @@ import AddDogForm from '../components/AddDogForm';
 import { fireAuth, fireStorage, fireStore } from '../firebase/firebase';
 import uuid from 'react-uuid';
 import { addCommentToPost } from '../redux/actions/getPostAction';
-import { deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { createNewPost, deletePost, likePost, updatePost } from '../redux/actions/createPostAction';
+import { Alert } from 'react-native';
 
 const Profile = ({
+  createPost,
   dogs,
   deletePost,
   navigation, 
@@ -42,7 +44,9 @@ const Profile = ({
   const [addDogFormVisible, setAddDogFormVisible] = useState(false);
   const [bannerImage, setBannerImage] = useState(null);
   const [uploadingNewImage, setUploadingNewImage] = useState(false);
-  const [session, setSession] = useState(null) 
+  const [image, setImage] = useState(null);
+
+  const [description, setDescription] = useState('');
 
   const openImagePicker = async () => {
     const result: any = await ImagePicker.launchImageLibraryAsync({
@@ -69,10 +73,47 @@ const Profile = ({
     }
   }
 
+
+  const openImagePickerPOST = async () => {
+    let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+    });
+    
+    if(permissionResult.granted === false) {
+      return (
+        Alert.alert(
+          'Permission Denied',
+          'Permission to access camera roll is required!'
+        )
+      )
+    }
+        
+    if(!result.cancelled) {
+      setImage(result.uri)
+    }
+  }
+
+  const onSubmitPost = async () => {
+    const userInput = { description, image };
+    createPost(userInput).then(() => setPostFormVisible(false))
+  }
+
   return (
     <>
     { addDogFormVisible && <AddDogForm dogCreated={() => setAddDogFormVisible(!addDogFormVisible)} onPress={() => setAddDogFormVisible(!addDogFormVisible)} /> }
-    { postFormVisible && <CreatePostForm visible={() => setPostFormVisible(!postFormVisible)} /> }
+    { postFormVisible && <CreatePostForm
+        submit={() => onSubmitPost()}
+        visible={() => setPostFormVisible(!postFormVisible)}
+        text={description}
+        onChangeText={(text => setDescription(text))}
+        imageUri={(uri) => console.log(uri)}
+        openImagePicker={() => openImagePickerPOST()}
+        image={image} 
+    /> }
       <Container>
         <AppHeader height={100}>
           <TitleArea onStartShouldSetResponder={() => navigation.pop()}>
@@ -104,7 +145,9 @@ const Profile = ({
                         color={colors.primary} 
                         name='ios-camera'
                         size={34} 
-                        onPress={() => openImagePicker()}
+                        onPress={() => {
+                          openImagePicker()
+                        }}
                       />
                     </BannerButton>
                   }
@@ -183,14 +226,14 @@ const Profile = ({
               <PetsContainer>
                 <Text fontSize={18} fontWeight='semi-bold' left={10}>My Pets</Text>
                 <ScrollView horizontal={true} style={{ height: 130 }} showsHorizontalScrollIndicator={false}>
-                  { dogs ?
+                  { dogs !== null ?
                     dogs.map((dog, index) => {
                       return (
-                        <PetItem key={index} onPress={() => navigation.push('petDetails', {
+                        <PetItem onPress={() => navigation.push('petDetails', {
                           dog
                         })}>
-                          <PatImage source={{ uri: dog.images[0] }} />
-                          <Text top={6}>{dog.name}</Text>
+                          <PatImage source={{ uri: dog?.images[0] }} />
+                          <Text top={6}>{dog?.name}</Text>
                         </PetItem>
                       )
                     })
@@ -237,6 +280,7 @@ const Profile = ({
                     <>
                       { post && 
                         <Card 
+                          key={index}
                           description={description}
                           username={postOwner.name}
                           imageUrl={imageUrl}
@@ -302,7 +346,8 @@ const mapDispatchToProps = (dispatch) => ({
     type: 'COMMENT_MODE',
     payload: { commentMode, postId }
   }),
-  updatePost: (userInput) => dispatch(updatePost(userInput))
+  updatePost: (userInput) => dispatch(updatePost(userInput)),
+  createPost: (userInput) => dispatch(createNewPost(userInput))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

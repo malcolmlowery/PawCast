@@ -27,6 +27,10 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
     name,
     personality,
     tailCrop,
+    image,
+    price,
+    shotsGiven,
+    bloodType,
   } = route.params.dog; 
 
   return (
@@ -44,15 +48,22 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
       </AppHeader>
 
       <ScrollView>
-        <ContentTitle>
-          <Text fontSize={28} fontWeight='semi-bold'>{name}</Text>
-        </ContentTitle>
+        { price !== undefined ?
+          <ContentTitle>
+            <Text fontSize={28} fontWeight='semi-bold'>{name}</Text>
+            <Text fontSize={28} color='alert' fontWeight='semi-bold'>Price ${price}</Text>
+          </ContentTitle>
+          :
+            <ContentTitle>
+              <Text fontSize={28} fontWeight='semi-bold'>{name}</Text>
+            </ContentTitle>
+        }
 
         <Banner>
-          <BannerImage source={{ uri: images[0] }} />
+          <BannerImage source={{ uri: images === undefined ? image[0] : images[0] }} />
         </Banner>
 
-        { dogOwner.uid === fireAuth.currentUser.uid &&
+        { dogOwner?.uid === fireAuth.currentUser.uid || dogOwner?.uid === fireAuth.currentUser.uid &&
           <ButtonGroup>
             { !editMode ? 
               <Button expand='none' width={120} onPress={() => setEditMode(!editMode)}>
@@ -105,6 +116,18 @@ const PetDetails = ({ deleteDog, navigation, route }) => {
               <Text color='white' fontWeight='semi-bold'>Personalitye:</Text>
               <Text color='white' fontWeight='semi-bold'>{personality}</Text>
             </InfoItem>
+            { shotsGiven !== undefined &&
+              <>
+              <InfoItem style={{ backgroundColor: colors.primary }}>
+                <Text color='white' fontWeight='semi-bold'>Shots Given:</Text>
+                <Text color='white' fontWeight='semi-bold'>{shotsGiven}</Text>
+              </InfoItem>
+              <InfoItem style={{ backgroundColor: colors.primary }}>
+                <Text color='white' fontWeight='semi-bold'>Blood Type:</Text>
+                <Text color='white' fontWeight='semi-bold'>{bloodType !== undefined ? bloodType : 'N/A'}</Text>
+              </InfoItem>
+              </>
+            }
           </DogInfoGroup>
 
           <DogImagesGroup>

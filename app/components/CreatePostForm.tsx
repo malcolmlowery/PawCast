@@ -17,7 +17,8 @@ const CreatePostForm = ({
   onChangeText, 
   text,
   openImagePicker,
-  image
+  image,
+  creatingPremPost
 }) => {
   
 
@@ -46,9 +47,10 @@ const CreatePostForm = ({
               </ImageSection>
             </Content>
 
-            { creatingPost == true ?
+            { creatingPost == true || creatingPremPost == true ?
                 <Wait>
                   <Text>Creating post...</Text>
+                  <Text fontSize={12} color='alert'>please wait</Text>
                 </Wait>
               :
                 <ButtonGroup>
@@ -82,7 +84,8 @@ const CreatePostForm = ({
 };
 
 const mapStateToProps = (state) => ({
-  creatingPost: state.posts.creatingPost
+  creatingPost: state.posts.creatingPost,
+  creatingPremPost: state.premiumPosts.creatingPremPost,
 })
 
 const mapDispatchToProps = (dispatch) => ({

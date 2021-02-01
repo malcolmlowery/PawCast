@@ -42,7 +42,7 @@ export const getPremiumUserProfile = (uid) => {
     
     const petsData = await fireStore
       .collection('premium_pets')
-      .where('petOwner', '==', uid)
+      .where('dogOwner', '==', uid)
       .get()
       .then(snapshot => {
         const data = [];

@@ -7,6 +7,7 @@ import {
 const intialState = {
   isLoading: null,
   data: [],
+  premiumLocations: [],
   error: null
 };
 
@@ -16,11 +17,15 @@ export const userLocationsReducer = (state = intialState, action) => {
       ...state,
       isLoading: true
     }
-    case USER_LOCATIONS_SUCCESS: return {
-      ...state,
-      isLoading: false,
-      data: action.payload,
-      error: false,
+    case USER_LOCATIONS_SUCCESS: {
+      console.log(action.payload.data)
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload.data,
+        premiumLocations: action.payload.premiumData,
+        error: false,
+      }
     }
     case USER_LOCATIONS_FAILURE: return {
       ...state,

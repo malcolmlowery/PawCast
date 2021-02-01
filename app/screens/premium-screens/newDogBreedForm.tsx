@@ -123,7 +123,7 @@ const NewDogBreedForm = ({
 
     submitNewDog(userInput)
 
-    if(isCreating == false && error == null) {
+    if(isCreating == false) {
       return navigation.pop()
     }
   }
@@ -180,11 +180,7 @@ const NewDogBreedForm = ({
             ]} 
           />
 
-          <DropDown 
-            onValueChange={(value) => setAge(value)}
-            title='Age (human years)'
-            labels={numbers.map(values => values)} 
-          />
+          <TextInput label='Age' placeholder='Human Years' onChangeText={(text) => setAge(text)} value={age} />
 
           <TextInput label='Color' onChangeText={(text) => setColor(text)} value={color} />
 
@@ -208,19 +204,11 @@ const NewDogBreedForm = ({
               { label: 'Short Tail Crop', value: 'short' },
               { label: 'Long Tail Crop', value: 'long' },
               { label: 'Military Tail Crop', value: 'military' },
+              { label: 'No Tail', value: 'none' },
             ]} 
           />
 
           <TextInput label='Shots Given' placeholder='Deworming, Rabies, Boosters' onChangeText={(text) => setShotsGiven(text)} value={shotsGiven} />
-
-          <DropDown 
-            onValueChange={(value) => setTailCrop(value)}
-            title='Tail Crop Style'
-            labels={[
-              { label: 'Long Tail Crop', value: 'long tail crop' },
-              { label: 'Short Tail Crop', value: 'short tail crop' },
-            ]} 
-          />
 
           <DropDown 
             onValueChange={(value) => setpPersonality(value)}
@@ -263,8 +251,8 @@ const NewDogBreedForm = ({
 };
 
 const mapStateToProps = (state) => ({
-  isCreating: state.premiumPets.isCreating,
-  error: state.premiumPets.error,
+  isCreating: state.premiumProfile.isCreating,
+  error: state.premiumProfile.error,
 });
 
 const mapDispatchToProps = (dispatch) => ({

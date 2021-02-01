@@ -17,12 +17,12 @@ const addBusinessDetailsFailure = () => ({
   type: ADD_BUSINESS_DETAILS_FAILURE
 });
 
-export const addBusinessDetails = (userInput) => {
+export const addBusinessDetails = (userInput, editMode) => {
 
   return async (dispatch) => {
     dispatch(addBusinessDetailsRequest())
 
-    fireStore
+      await fireStore
       .collection('premium_users')
       .doc(fireAuth.currentUser.uid)
       .update({
@@ -31,7 +31,8 @@ export const addBusinessDetails = (userInput) => {
         }
       })
       .then(() => dispatch(addBusinessDetailsSuccess({userInput})))
-      .catch(error => dispatch(addBusinessDetailsFailure(error)))
-    
+      .catch(() => dispatch(addBusinessDetailsFailure()))
+  
+
   }
 };

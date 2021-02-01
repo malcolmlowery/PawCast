@@ -35,7 +35,7 @@ const createPostFailure = () => ({
 
 export const createNewPost = (userInput) => {
   const { description, image } = userInput;
-
+  
   return async (dispatch) => {
     try {
       dispatch(createPostRequest())
@@ -90,7 +90,6 @@ export const createNewPost = (userInput) => {
           })
           .catch(error => console.log(error))
       }
-
 
       await fireStore
           .collection('posts')

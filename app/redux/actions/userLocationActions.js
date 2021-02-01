@@ -23,15 +23,29 @@ export const getUserLocations = () => {
     dispatch(userLocationsRequest())
     try{
       const data = [];
+      const premiumData = [];
 
       await fireStore
         .collection('user_locations')
         .get()
         .then(snapshot => {
-          snapshot.forEach(doc => data.push(doc.data()))
+          snapshot.forEach(doc => {
+            data.push(doc.data())
+          })
         });
+      
+      await fireStore
+        .collection('premium_users')
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            premiumData.push(doc.data())
+          })
+        })
 
-      dispatch(userLocationsSuccess(data))
+        console.log(data, premiumData)
+
+      dispatch(userLocationsSuccess({data: data, premiumData: premiumData}))
     }
     catch(error) {
       dispatch(userLocationsFailure())

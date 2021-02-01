@@ -10,6 +10,7 @@ import Button from '../../components/Button';
 import { connect } from 'react-redux';
 import { getPremiumUserProfile } from '../../redux/actions/premiumAccountActions/getPremUserProfile';
 import { fireAuth } from '../../firebase/firebase';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const PremiumProfile = ({
   getUserProfile,
@@ -71,13 +72,46 @@ const PremiumProfile = ({
               <SpecialtiesInfo>
                 <Text color='lightGray'>~ Doberman</Text>
                   <Text color='lightGray'>~ {user.details?.city}</Text>
-                <Capsule style={{ backgroundColor: colors.alert }}>
-                  { user.verified == true && <Text color='white'>Verified</Text> }
-                </Capsule>
+                  { user.specialty === 'breeder' &&
+                    <Capsule style={{ backgroundColor: colors.alert }}>
+                      <Text fontSize={10} fontWeight='bold' color='white'>PENDING</Text>
+                      <Text color='white'>Verification</Text>
+                    </Capsule>
+                  }
               </SpecialtiesInfo>
               { fireAuth.currentUser.uid !== user.uid &&
                 <ButtonGroup>
-                  <Button color='white' fill='primary' expand='none' width={200}>Send Message</Button>
+                  <Button color='white' fill='primary' expand='none' width={200} onPress={() => navigation.navigate('chatroom', {
+                    userProfileId: uid
+                  })} >Send Message</Button>
+                </ButtonGroup>
+              }
+              { fireAuth.currentUser.uid === user.uid && user?.details !== undefined &&
+                <ButtonGroup>
+                  <Button width={200} fontWeight='semi-bold' fill='danger' onPress={() => navigation.push('addPremUserDetails', { 
+                      specialty: user.specialty,
+                      farmName: user.details.farmName,
+                      registeredBreeder: user.details.registeredBreeder,
+                      yearsInBusiness: user.details.yearsInBusiness,
+                      breederId: user.details.breederId,
+                      address:user.details.address,
+                      city: user.details.city,
+                      state: user.details.state,
+                      zipcode: user.details.zipcode,
+
+
+                      businessName: user.details.businessName,
+                      specialized: user.details.specialized,
+                      trainingStyles: user.details.trainingStyles,
+
+                      ears: user?.details.ears,
+                      tail: user?.details.tail,
+                      shots: user?.details.shots,
+
+
+                      editMode: true,
+                    }
+                  )}>Edit business details</Button>
                 </ButtonGroup>
               }
               <>
@@ -91,7 +125,7 @@ const PremiumProfile = ({
                     </BioTitle>
 
                     <Text color='lightGray'>Farm Name: <Text color='darkText'>{user.details.farmName}</Text></Text>
-                    <Text color='lightGray'>Registered Breeder: <Text color='darkText'>{user.details.registeredBreeder ? 'Yes' : 'No'}</Text></Text>
+                    <Text color='lightGray'>Registered Breeder: <Text color='darkText'>{user.details.registeredBreeder ? 'No' : 'Yes'}</Text></Text>
                     { user.details.breederId &&
                       <Text color='lightGray'>Breeder ID: <Text color='darkText'>{user.details.breederId}</Text></Text>
                     }
@@ -144,7 +178,7 @@ const PremiumProfile = ({
                       <Text fontSize={18} fontWeight='semi-bold' color='darkText'>Details</Text>
                     </BioTitle>
 
-                    <Text color='lightGray'>Farm Name: <Text color='darkText'>{user.details.businessName}</Text></Text>
+                    <Text color='lightGray'>Business Name: <Text color='darkText'>{user.details.businessName}</Text></Text>
                     <Text color='lightGray'>Specialized with Dobermanns: <Text color='darkText'>{user.details.specialized ? 'Yes' : 'No'}</Text></Text>
                     <Text color='lightGray'>Training Styles: <Text color='darkText'>{user.details.trainingStyles}</Text></Text>
                     <Text color='lightGray'>Year(s) in business: <Text color='darkText'>{user.details.yearsInBusiness}</Text></Text>
@@ -190,9 +224,11 @@ const PremiumProfile = ({
                       <Text fontSize={18} fontWeight='semi-bold' color='darkText'>Details</Text>
                     </BioTitle>
 
-                    <Text color='lightGray'>Vet Business Name: <Text color='darkText'>{user.details.farmName}</Text></Text>
+                    <Text color='lightGray'>Vet Business Name: <Text color='darkText'>{user.details.businessName}</Text></Text>
                     <Text color='lightGray'>Year(s) in business: <Text color='darkText'>{user.details.yearsInBusiness}</Text></Text>
-                    <Text color='lightGray'>Shots: <Text color='darkText'>{user.details.registeredBreeder ? 'Yes' : 'No'}</Text></Text>
+                    <Text color='lightGray'>Shots available: <Text color='darkText'>{user?.details.shots}</Text></Text>
+                    <Text color='lightGray'>Ear crop service: <Text color='darkText'>{user?.details.ears ? 'Yes' : 'No'}</Text></Text>
+                    <Text color='lightGray'>Tail crop service: <Text color='darkText'>{user?.details.tail ? 'Yes' : 'No'}</Text></Text>
                     <Text color='lightGray'>Location: <Text color='alert'fontWeight='semi-bold' onPress={() => {
                       
                       const {
@@ -200,11 +236,6 @@ const PremiumProfile = ({
                         lat,
                         lng,
                       } = user.details;
-
-                      console.log(address,
-                        lat,
-                        lng,)
-
 
                       const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
                       const latLng = `${lat},${lng}`;
@@ -217,7 +248,7 @@ const PremiumProfile = ({
                       Linking.openURL(url); 
 
 
-                    }}>{user.details.address}</Text></Text>
+                    }}>{user.details.address} - {user?.details.city}, {user?.details.state}, {user?.details.zipcode}</Text></Text>
                   </Bio>
                   :
                   <View style={{ alignItems: 'center', marginBottom: 16 }}>
@@ -241,9 +272,15 @@ const PremiumProfile = ({
                   <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                     { pets !== undefined && 
                       pets.map((pet, i) => {
+                        console.log(pet)
                         return (
+                          
                           <DogImageContent>
-                            <Image source={{ uri: pet.image[0] }} />
+                            <TouchableWithoutFeedback style={{width: 210 }} onPress={() => navigation.push('petDetails', {
+                            dog: pet
+                          })}>
+                            <Image source={{ uri: pet?.image[0] }} />
+                            </TouchableWithoutFeedback>
                           </DogImageContent>
                         )
                       })
@@ -356,6 +393,7 @@ const Header = styled.View`
 const Capsule = styled.View`
   border-radius: 20px;
   padding: 5px 12px;
+  align-items: center;
 `;
 
 const Content = styled.View`

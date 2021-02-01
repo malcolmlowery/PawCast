@@ -11,7 +11,7 @@ const createPremDogRequest = () => ({
 
 const createPremDogSuccess = (data) => ({
   type: CREATE_PREMDOG_SUCCESS,
-  paload: data
+  payload: data
 });
 
 const createPremDogFailure = (error) => ({
@@ -40,6 +40,7 @@ export const createPremiumPet = (userInput) => {
 
     const user = fireAuth.currentUser;
     const imageBlob = await fetch(image).then(response => response.blob());
+    const dogId = await fireStore.collection('premium_pets').doc().id;
 
     const urlOfImage = await fireStorage
     .ref()
@@ -54,7 +55,8 @@ export const createPremiumPet = (userInput) => {
       .collection('premium_pets')
       .doc()
       .set({
-        petOwner: user.uid,
+        dogId,
+        dogOwner: user.uid,
         image: [ urlOfImage ],
         name,
         breed,
@@ -70,7 +72,8 @@ export const createPremiumPet = (userInput) => {
       })
       .then(() => {
         dispatch(createPremDogSuccess({
-          petOwner: user.uid,
+          dogId,
+          dogOwner: user.uid,
           image: [ urlOfImage ],
           name,
           breed,

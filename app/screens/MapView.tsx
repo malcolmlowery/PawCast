@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
-import { Dimensions, Image, RefreshControl } from 'react-native';
+import { Dimensions, Image, RefreshControl, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ReactMapView from 'react-native-maps';
 import { connect } from 'react-redux';
@@ -21,7 +21,8 @@ const MapView = ({
   getUserLocations,
   getAllDobermanns,
   locations,
-  navigation 
+  navigation,
+  premiumLocations
 }) => {
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const MapView = ({
   }, [])
 
   const currentUserLoc = locations.find(userLoc => userLoc.uid === fireAuth.currentUser.uid)
-
+ 
   return (
     <Container>
       <AppHeader>
@@ -75,11 +76,12 @@ const MapView = ({
                 return (
                   <Marker 
                     key={index}
-                    coordinate={{ longitude: loc.lng + 0.0041, latitude: loc.lat + 0.0021 }}
-                    title={`${loc.firstName} ${loc.lastName}`}
-                    onCalloutPress={() => navigation.push('profile', { uid: loc.uid })}
+                    coordinate={{ longitude: loc?.lng + 0.0041, latitude: loc?.lat + 0.0021 }}
+                    title={`${loc?.firstName} ${loc?.lastName}`}
+                    onCalloutPress={() => navigation.push('profile', { uid: loc?.uid })}
                     zIndex={index}
                   > 
+                  { loc?.profileImage &&
                     <Image 
                       style={{ 
                         borderRadius: 25, 
@@ -87,13 +89,85 @@ const MapView = ({
                         borderWidth: 1,
                       }} 
                       source={{ 
-                        uri: loc.profileImage, 
+                        uri: loc?.profileImage, 
                         height: 50, 
                         width: 50 
                       }
                     }/>
+                  }
                   </Marker>
                 )
+              })
+            }
+
+          { premiumLocations &&
+              premiumLocations.map((user, index) => {
+                if(user.details !== undefined) {
+                  return (
+                    <Marker 
+                      key={index}
+                      coordinate={{ longitude: user.details?.lng + 0.0041, latitude: user.details?.lat + 0.0021 }}
+                      title={ 
+                        user?.details.farmName ? user?.details?.farmName : user.displayName 
+                        || 
+                        user?.details.businessName ? user?.details?.businessName : user.displayName  
+                      }
+                      onCalloutPress={() => navigation.push('premium-profile', { uid: user.uid })}
+                      zIndex={index}
+                      style={{ alignItems: 'center' }}
+                    > 
+                    { 
+                      <>
+                        <Image 
+                          style={{ 
+                            borderRadius: 25, 
+                            borderColor: colors.primary, 
+                            borderWidth: 3,
+                          }} 
+                          source={{ 
+                            uri: user.profileImage, 
+                            height: 50, 
+                            width: 50 
+                          }}
+                        />
+                        { user.specialty === 'breeder' &&
+                          <View style={{
+                            marginTop: 4,
+                            borderRadius: 6,
+                            backgroundColor: colors.primary,
+                            padding: 5,
+                          }}>
+                            <Text color='white'>BREEDER</Text>
+                          </View>
+                        }
+                        { user.specialty === 'trainer' &&
+                          <View style={{
+                            marginTop: 4,
+                            borderRadius: 6,
+                            backgroundColor: '#9c27b0',
+                            padding: 5,
+                          }}>
+                            <Text color='white'>TRAINER</Text>
+                          </View>
+                        }
+                        { user.specialty === 'veterinarian' &&
+                          <View style={{
+                            marginTop: 4,
+                            borderRadius: 6,
+                            backgroundColor: '#26a69a',
+                            padding: 5,
+                            alignItems: 'center'
+                          }}>
+                            <Text color='white'>VET</Text>
+                          </View>
+                        }
+                      </>
+                    }
+                    </Marker>
+                  )
+                }
+                
+              
               })
             }
           </ReactMapView>
@@ -108,6 +182,7 @@ const MapView = ({
 const mapStateToProps = (state) => ({
   isLoading: state.userLocationsData.isLoading,
   locations: state.userLocationsData.data,
+  premiumLocations: state.userLocationsData.premiumLocations,
   error: state.userLocationsData.error,
   dobermannTotal: state.dobermannCounter.total,
   dobermannIsLoading: state.dobermannCounter.isLoading,

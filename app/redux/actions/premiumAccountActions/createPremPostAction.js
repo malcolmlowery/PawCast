@@ -40,8 +40,8 @@ export const createPremiumPost = (userInput) => {
       specialty,
       verified
     } = userData[0];
-
-    if(image !== null && userData !== undefined) {
+    
+    if(image !== null) {
       const imageBlob = await fetch(image).then(response => response.blob());
 
       const urlOfImage = await fireStorage
@@ -54,7 +54,7 @@ export const createPremiumPost = (userInput) => {
       .catch(error => console.log(error))
 
       if(image !== null) {
-        return await fireStore
+         await fireStore
         .collection('premium_posts')
         .doc()
         .set({
@@ -76,8 +76,8 @@ export const createPremiumPost = (userInput) => {
             specialty,
           }
         })
-        .then(() => {
-          dispatch(createPremiumPostSuccess({
+
+          return dispatch(createPremiumPostSuccess({
             displayName: user.displayName,
             dogType: 'Doberman',
             desc: description,
@@ -86,8 +86,8 @@ export const createPremiumPost = (userInput) => {
             ],
             postOwner: {
               location: {
-                city,
-                state
+                city: details.city,
+                state: details.state
               },
               verified,
               profileImage: user.photoURL,
@@ -95,13 +95,12 @@ export const createPremiumPost = (userInput) => {
               specialty,
             }
           }))
-        })
-        .catch(error => dispatch(createPremiumPostFailure(error)))
       }
     }
 
-    if(image == null) {
-      return await fireStore
+    if(image == null && userData !== undefined) {
+      console.log('1')
+      await fireStore
       .collection('premium_posts')
       .doc()
       .set({
@@ -121,16 +120,16 @@ export const createPremiumPost = (userInput) => {
           specialty,
         }
       })
-      .then(() => {
-        dispatch(createPremiumPostSuccess({
+      
+        return dispatch(createPremiumPostSuccess({
           displayName: user.displayName,
           dogType: 'Doberman',
           desc: description,
           postImages: [],
           postOwner: {
             location: {
-              city,
-              state
+              city: details.city,
+              state: details.state,
             },
             verified,
             profileImage: user.photoURL,
@@ -138,8 +137,7 @@ export const createPremiumPost = (userInput) => {
             specialty,
           }
         }))
-      })
-      .catch(error => dispatch(createPremiumPostFailure(error)))
+        
     }
   }
 }

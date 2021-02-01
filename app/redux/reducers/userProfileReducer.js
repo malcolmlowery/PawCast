@@ -16,7 +16,7 @@ const intialState = {
   errors: null,
   isLoading: true,
   data: [],
-  dogs: [],
+  dogs: null,
   dogsLoading: false,
 }
 
@@ -167,7 +167,7 @@ case UPDATE_POST_SUCCESS: return {
     }
     case CREATE_DOG_SUCCESS: return {
       ...state,
-      dogs: state.dogs.concat(action.payload),
+      dogs: [action.payload].concat(state.dogs),
       dogCreated: true,
     }
     case DELETE_DOG_SUCCESS: return {

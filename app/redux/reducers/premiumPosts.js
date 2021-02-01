@@ -1,5 +1,6 @@
 const intialState = {
   isLoading: false,
+  creatingPremPost: false,
   posts: [],
   error: null,
 };
@@ -26,9 +27,17 @@ export const premiumPostsReducer = (state = intialState, action) => {
       isLoading: false,
       error: action.payload
     }
-    case CREATE_PREMIUM_POST_SUCCESS: return {
+    case 'CREATE_PREMIUM_POST_REQUEST': return {
       ...state,
-      posts: [action.payload].concat(state.posts)
+      creatingPremPost: true,
+    }
+    case 'CREATE_PREMIUM_POST_SUCCESS': {
+      console.log(action.payload)
+      return {
+        ...state,
+        creatingPremPost: false,
+        posts: [action.payload].concat(state.posts)
+      }
     }
     case GET_FILTERED_POSTS_SUCCESS: {
       console.log(action.payload)

@@ -5,7 +5,8 @@ const initialState = {
   },
   pets: [],
   posts: [],
-  error: null
+  error: null,
+  isCreating: false,
 };
 
 const GET_PREMIUM_PROFILE_REQUEST = 'GET_PREMIUM_PROFILE_REQUEST';
@@ -42,6 +43,27 @@ export const premiumUserProfile = (state = initialState, action) => {
       ...state,
       isLoading: false,
       error: action.payload
+    }
+    case 'CREATE_PREMDOG_SUCCESS': {
+      const { petsData } = action.payload;
+        return {
+        ...state,
+        isCreating: false,
+        pets: [action.payload].concat(state.pets)
+      }
+    }
+    case 'CREATE_PREMDOG_REQUEST': return {
+      ...state,
+      isCreating: true
+    }
+    case 'CREATE_PREMDOG_FAILURE': return {
+      ...state,
+      isCreating: false,
+      error: action.payload
+    }
+    case 'DELETE_DOG_SUCCESS': return {
+      ...state,
+      pets: state.pets.filter(pet => pet.dogId !== action.payload)
     }
     default: return state
   }

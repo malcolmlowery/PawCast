@@ -79,9 +79,9 @@ export const createNewDog = (userInput) => {
           tailCrop,
           personality,
         })
-        .then((doc) => {
+        
           console.log('Created Dog!!!')
-          dispatch(createDogSuccess({
+          return dispatch(createDogSuccess({
             dogId,
             images: [imageUrl],
             name,
@@ -94,11 +94,6 @@ export const createNewDog = (userInput) => {
             tailCrop,
             personality,
           }))
-        })
-        .catch(error => {
-          console.log(error)
-          dispatch(createDogFailure())
-        })
     }
     catch(error) {
       console.log(error)
@@ -123,7 +118,7 @@ export const deleteDog = (dogId) => {
   return async (dispatch) => {
     try {
       dispatch(deleteDogRequest())
-
+      
       await fireStore.collection('animals')
         .where('dogId', '==', dogId)
         .get()
@@ -134,6 +129,17 @@ export const deleteDog = (dogId) => {
             dispatch(deleteDogSuccess(dogId))
           })
         })
+
+      await fireStore.collection('premium_pets')
+      .where('dogId', '==', dogId)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          doc.ref.delete()
+          console.log('Dog deleted successfully!')
+          dispatch(deleteDogSuccess(dogId))
+        })
+      })
     }
     catch(error) {
       console.log(error)

@@ -142,6 +142,7 @@ const AddDogForm = ({
                     labels={[
                       { label: 'American', value: 'american' },
                       { label: 'European', value: 'european' },
+                      { label: 'American/European', value: 'american/european' },
                     ]} 
                   />
                   <DropDown 
@@ -152,26 +153,30 @@ const AddDogForm = ({
                       { label: 'Female', value: 'female' },
                     ]} 
                   />
-                  <DropDown 
-                    onValueChange={(value) => setAge(value)}
-                    title='Age (dog years)'
-                    labels={numbers.map(values => values)} 
-                  />
+
+                  <TextInput label='Age' placeholder='Human Years' onChangeText={(text) => setAge(text)} value={age} />
                   <TextInput label='Color' onChangeText={(text) => setColor(text)} value={color} />
+                  
                   <DropDown 
                     onValueChange={(value) => setEarCrop(value)}
                     title='Ear Crop Style'
                     labels={[
-                      { label: 'Long Crop', value: 'long crop' },
-                      { label: 'Short Crop', value: 'short crop' },
+                      { label: 'Natural', value: 'natural' },
+                      { label: 'Military Ear Crop', value: 'military' },
+                      { label: 'Long Ear Crop', value: 'long' },
+                      { label: 'Medium Ear Crop', value: 'medium' },
+                      { label: 'Short Ear Crop', value: 'short' },
                     ]} 
                   />
                   <DropDown 
                     onValueChange={(value) => setTailCrop(value)}
                     title='Tail Crop Style'
                     labels={[
-                      { label: 'Long Tail Crop', value: 'long tail crop' },
-                      { label: 'Short Tail Crop', value: 'short tail crop' },
+                      { label: 'Normal Tail Crop', value: 'normal' },
+                      { label: 'Short Tail Crop', value: 'short' },
+                      { label: 'Long Tail Crop', value: 'long' },
+                      { label: 'Military Tail Crop', value: 'military' },
+                      { label: 'No Tail', value: 'none' },
                     ]} 
                   />
                   <DropDown 
