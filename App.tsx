@@ -1,6 +1,6 @@
 import React from 'react';
-import Navigation from './Navigation';
-import { store } from './redux/store';
+import Navigation from './app/Navigation';
+import { store } from './app/redux/store';
 import { Provider } from 'react-redux';
 
 const App = () => {
